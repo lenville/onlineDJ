@@ -1,52 +1,11 @@
 <!doctype html>
-<html lang="en">
+<html>
 <head>
 	<meta charset="UTF-8">
-	<title>Document</title>
+	<title>Test</title>
 </head>
 <body>
-	<script src="buffer-loader.js"></script>
-	<script>
-		window.onload  = init;
-		var context;
-		var bufferLoader;
-		
-
-		/*Web Audio API初始化*/
-		function init() {
-			/*建立AudioContext实例,webKit核心的浏览器, 需要加上webkit前缀*/
-			context = new webkitAudioContext();
-			/*创建AudioBuffer*/
-			bufferLoader = new BufferLoader(
-				context,
-				[
-					'music/1.mp3',
-					'music/2.mp3',
-				],
-				finishedLoading
-			);
-			bufferLoader.load();
-		}
-
-		function finishedLoading(bufferList) {
-		//创建两个实例并同时播放之
-		var source1    = context.createBufferSource();
-		var source2    = context.createBufferSource();
-		source1.buffer = bufferList[0];
-		source2.buffer = bufferList[1];
-		source1.connect(context.destination);
-		source2.connect(context.destination);
-		source1.noteOn(0);
-		source2.noteOn(0);
-		}
-
-		function playSound(buffer, time) {
-			var source = context.createBufferSource();//创建一个声音源
-			source.buffer = buffer;//告诉该源播放何物
-			source.connect(context.destination);//将该源与硬件相连
-			source.noteOn(time);//time时间后播放该实例
-		}
-		
-	</script>
+	<script src="js/buffer-loader.js"></script>
+	<script src="js/onlinedj"></script>
 </body>
 </html>
