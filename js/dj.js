@@ -9,7 +9,9 @@ var dj = {
 		},false)
 	}
 	,rub: function() {
-		var baseX , baseY;
+		var baseX , baseY
+		,height = document.documentElement.clientHeight
+		,width = document.documentElement.clientWidth;
 		document.addEventListener('touchstart',function(){
 			baseX = event.touches[0].clientX;
 			baseY = event.touches[0].clientY;
@@ -26,8 +28,7 @@ var dj = {
 			//audio.currentTime += y/100;
 
 			//判定擦盘位置，旋转擦盘，改变音轨
-			height = document.documentElement.clientHeight;
-			width = document.documentElement.clientWidth;
+			
 			touch_arr.push([x,y]);
 			var len = touch_arr.length;
 			var reg = /\-?[0-9]+\.?[0-9]*/g ;
