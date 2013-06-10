@@ -11,48 +11,42 @@
 		var context;
 		var bufferLoader;
 		
+
 		/*Web Audio API初始化*/
 		function init() {
-		context = new webkitAudioContext();//建立AudioContext实例,webKit核心的浏览器, 需要加上webkit前缀
-		bufferLoader = new BufferLoader(
-		context,
-		[
-		'music/1.mp3',
-		'music/2.mp3',
-		],
-		finishedLoading
-		);
-		
-		bufferLoader.load();
+			/*建立AudioContext实例,webKit核心的浏览器, 需要加上webkit前缀*/
+			context = new webkitAudioContext();
+			/*创建AudioBuffer*/
+			bufferLoader = new BufferLoader(
+				context,
+				[
+					'music/1.mp3',
+					'music/2.mp3',
+				],
+				finishedLoading
+			);
+			bufferLoader.load();
 		}
-		
+
 		function finishedLoading(bufferList) {
 		//创建两个实例并同时播放之
 		var source1    = context.createBufferSource();
 		var source2    = context.createBufferSource();
 		source1.buffer = bufferList[0];
 		source2.buffer = bufferList[1];
-		
 		source1.connect(context.destination);
 		source2.connect(context.destination);
 		source1.noteOn(0);
 		source2.noteOn(0);
 		}
 
-		for (var bar = 0; bar &lt; 2; bar++) {
-		var time = startTime + bar * 8 * eighthNoteTime;
-		// 在鼓点1、5上播放
-		playSound(kick, time);
-		playSound(kick, time + 4 * eighthNoteTime);
-
-		// 在3、7上播放另一音效
-		playSound(snare, time + 2 * eighthNoteTime);
-		playSound(snare, time + 6 * eighthNoteTime);
-
-		//每8点播放一次
-		for (var i = 0; i &lt; 8; ++i) {
-		playSound(hihat, time + i * eighthNoteTime);
+		function playSound(buffer, time) {
+			var source = context.createBufferSource();//创建一个声音源
+			source.buffer = buffer;//告诉该源播放何物
+			source.connect(context.destination);//将该源与硬件相连
+			source.noteOn(time);//time时间后播放该实例
 		}
+		
 	</script>
 </body>
 </html>
