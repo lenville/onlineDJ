@@ -27,7 +27,7 @@ body{
 }
 .shadow .table .platter .logo{
 	height: 326px;
-	width: 364px;
+	width: 326px;
 	position: relative;
 	left: 19px;
 	top: 19px;
@@ -43,4 +43,28 @@ body{
 	height: 500px;
 	width: 102px;
 	background: url('../image/table_tonearm.png') no-repeat;
+}
+.shadow .table .startstop{
+	position: relative;
+	left: 13px;
+	top: 323px;
+	width: 46px;
+	height: 36px;
+	background: url('../image/table_startstop.png') no-repeat;
+}
+.shadow .table .volumndown{
+	position: relative;
+	left: 66px;
+	top: 309px;
+	width: 25px;
+	height: 7px;
+	background: url('../image/table_volumn_down.png') no-repeat;
+}
+.shadow .table .volumnup{
+	position: relative;
+	left:95px;
+	top: 316px;
+	width: 25px;
+	height: 7px;
+	background: url('../image/table_volumn_up.png') no-repeat;
 }
