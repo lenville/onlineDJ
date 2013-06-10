@@ -11,10 +11,10 @@
 		var context;
 		var bufferLoader;
 		
+		/*Web Audio API初始化*/
 		function init() {
-		context        = new webkitAudioContext();
-		
-		bufferLoader   = new BufferLoader(
+		context = new webkitAudioContext();//建立AudioContext实例,webKit核心的浏览器, 需要加上webkit前缀
+		bufferLoader = new BufferLoader(
 		context,
 		[
 		'music/1.mp3',
@@ -37,6 +37,21 @@
 		source2.connect(context.destination);
 		source1.noteOn(0);
 		source2.noteOn(0);
+		}
+
+		for (var bar = 0; bar &lt; 2; bar++) {
+		var time = startTime + bar * 8 * eighthNoteTime;
+		// 在鼓点1、5上播放
+		playSound(kick, time);
+		playSound(kick, time + 4 * eighthNoteTime);
+
+		// 在3、7上播放另一音效
+		playSound(snare, time + 2 * eighthNoteTime);
+		playSound(snare, time + 6 * eighthNoteTime);
+
+		//每8点播放一次
+		for (var i = 0; i &lt; 8; ++i) {
+		playSound(hihat, time + i * eighthNoteTime);
 		}
 	</script>
 </body>
