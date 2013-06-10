@@ -1,9 +1,12 @@
-.containner{
+body{
+	background-image: url('../image/bg.png');
+}
+.container{
 	padding-top: 20px;
 }
 .shadow{
 	height: 500px;
-	background: url('../img/table_shadow.png') no-repeat;
+	background: url('../image/table_shadow.png') no-repeat;
 }
 .shadow .table{
 	position: relative;
@@ -11,7 +14,7 @@
 	top: 26px; 
 	height: 500px;
 	width: 500px;
-	background: url('../img/table_body.png') no-repeat;
+	background: url('../image/table_body.png') no-repeat;
 }
 .shadow .table .platter{
 	float: left;
@@ -20,7 +23,7 @@
 	position: relative;
 	left: 25px;
 	top: 3px;
-	background: url('../img/table_platter.png') no-repeat;
+	background: url('../image/table_platter.png') no-repeat;
 }
 .shadow .table .platter .logo{
 	height: 326px;
@@ -28,7 +31,7 @@
 	position: relative;
 	left: 19px;
 	top: 19px;
-	background: url('../img/techniques.png') no-repeat;
+	background: url('../image/techniques.png') no-repeat;
 }
 .shadow .table .tonearm{
 	position: relative;
@@ -39,5 +42,5 @@
 	float: left;
 	height: 500px;
 	width: 102px;
-	background: url('../img/table_tonearm.png') no-repeat;
+	background: url('../image/table_tonearm.png') no-repeat;
 }
