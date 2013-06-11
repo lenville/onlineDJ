@@ -50,13 +50,23 @@
 				}
 			}
 
+		function start(){
+			init();
 			startLoadingSounds();
+			var audio1 = document.querySelector('audio');
+			var source1 = audioContext.createMediaElementSource(audioElement);
+			var gainNode = context.createGainNode();
+			gainNode.gain.value = 100;
+			//source1.connect(filter);
+			source1.connect(gainNode);
+			gainNode.connect(context.destination);
+		}
 
 		}
 	</script>
 </head>
-<body onload="init();">
-	
+<body onload="start();">
+	<audio src="music/1.mp3" control></audio>
 </body>
 </html>
 
