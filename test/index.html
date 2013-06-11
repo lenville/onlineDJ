@@ -1,44 +1,6 @@
 <html>
 <head>
 	<script>
-		function startLoadingSounds() {
-			var Request_1 = new XMLHttpRequest();
-			Request_1.open("GET", "music/1.mp3", true);
-			Request_1.responseType = "arraybuffer";
-			Request_1.onload = function() {
-			  audioContext.decodeAudioData( Request_1.response, function(buffer) { 
-			    	glassBuffer = buffer; 
-			    	buffers[0]= glassBuffer;
-				} );
-			}
-			Request_1.send();
-			/*
-			var Request_2 = new XMLHttpRequest();
-				Request_2.open("GET", "music/2.mp3", true);
-				Request_2.responseType = "arraybuffer";
-				Request_2.onload = function() {
-				  audioContext.decodeAudioData( Request_2.response, function(buffer) { 
-				    	glassBuffer = buffer; 
-				    	buffers[0]= glassBuffer;
-					} );
-				}
-			Request_2.send();
-
-			var Request_3 = new XMLHttpRequest();
-				Request_3.open("GET", "music/3.mp3", true);
-				Request_3.responseType = "arraybuffer";
-				Request_3.onload = function() {
-				  audioContext.decodeAudioData( Request_3.response, function(buffer) { 
-				    	glassBuffer = buffer; 
-				    	buffers[0]= glassBuffer;
-					} );
-				}
-			Request_3.send();
-			*/
-
-
-		}
-
 		function init(){
 			try{
 				context = new AudioContext();
@@ -53,7 +15,6 @@
 
 		function start(){
 			init();
-			startLoadingSounds();
 			var audio1 = document.querySelector('audio');
 			var source1 = context.createMediaElementSource(audio1);
 			var gainNode = context.createGainNode();
