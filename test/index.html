@@ -56,7 +56,7 @@
 			var audio1 = document.querySelector('audio');
 			var source1 = audioContext.createMediaElementSource(audioElement);
 			var gainNode = context.createGainNode();
-			gainNode.gain.value = 100;
+			gainNode.gain.value = 10;
 			//source1.connect(filter);
 			source1.connect(gainNode);
 			gainNode.connect(context.destination);
