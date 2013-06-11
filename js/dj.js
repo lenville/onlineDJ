@@ -5,7 +5,7 @@ var touch_arr = [];
 var ptime = 5;
 //定时器控制器
 var p = 1;
-
+//var a;
 var dj = {	
 	//定时器
 	interval: function (fn,time){
@@ -14,16 +14,19 @@ var dj = {
 			setTimeout(arguments.callee, time);
 		}, time)
 	}
-	,start: function (name){
-		var that = this
-		,reg = /\-?[0-9]+\.?[0-9]*/g ;
-		$('body')[0].style.height = document.documentElement.clientHeight;
-		audio = new Audio('music/'+name+'.mp3');
+	,startMusic: function (name){
+		if(!audio)
+			audio = new Audio('music/'+name+'.mp3');
+		else 
+			audio.src = 'music/'+name+'.mp3';
 		audio.addEventListener('canplaythrough', function(){
-			audio.play();
-			that.interval(fn,30);
+			audio.play();			
 		},false)
-		var pdeg = 360/(ptime/0.03);
+	}
+	,startRub: function(){
+		this.interval(fn,30);
+		var pdeg = 360/(ptime/0.03)
+		,reg = /\-?[0-9]+\.?[0-9]*/g ;
 		function fn (){
 			var rotate = $('.logo')[0].style.webkitTransform.match(reg)[0];
 			if(p == 1)
@@ -36,7 +39,6 @@ var dj = {
 		,width = $('.cover')[0].clientWidth
 		,reg = /\-?[0-9]+\.?[0-9]*/g ;
 
-		
 		/*
 		document.addEventListener('touchstart',function(){
 			baseX = event.touches[0].clientX;
@@ -195,11 +197,31 @@ var dj = {
 			audio.play();
 			$('.cover').unbind('mousemove', turn);
 		})
-		
-	
+	}
+	,drag: function(){
+		var that = this;
+		$('.musiclist').bind('dragstart',function(){
+			//a=this;
+			//console.log(this.childNodes[5].value);
+			event.dataTransfer.setData('Text',this.childNodes[5].value);
+		})
+		$('.cover').bind('dragover',function(){
+			event.preventDefault();
+		})
+		$('.cover').bind('dragenter',function(){
+			event.preventDefault();
+		})
+		$('.cover').bind('drop',function(){
+			var data = event.dataTransfer.getData('Text');
+			that.startMusic(data)
+			//console.log(data);
+		})
 	}
 	,init: function(){
-		this.start('1');
+		$('body')[0].style.height = document.documentElement.clientHeight;
+		this.startMusic('1');
+		this.startRub();
+		this.drag();
 		this.rub();
 	}
 }
