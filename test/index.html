@@ -1,4 +1,5 @@
-<html><head>
+<html>
+<head>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 <title>
 Real-time Convolution Effects
@@ -16,9 +17,6 @@ Real-time Convolution Effects
 
 <!-- Our javascript code -->
 <script type="text/javascript">
-
-// Events
-// init() once the page has finished loading.
 window.onload = init;
 
 var context = 0;
@@ -36,44 +34,11 @@ var loadCount = 0;
 var hilightedElement = 0;
 
 var fileCount = 29;
-var responseOffset = 4;
+var responseOffset = 2;
 
 var fileList = [
-    "sounds/hyper-reality/human-voice.mp4",       // 0
-    "sounds/hyper-reality/obama-oilspill.mp4",    // 1
-    "sounds/drum-samples/conga-rhythm.wav",       // 2
-    "sounds/hyper-reality/br-jam-loop.wav",       // 3
-
-    // impulse responses
-    "impulse-responses/spatialized5.wav",         // 0
-    "impulse-responses/cosmic-ping-long.wav",     // 1
-    "impulse-responses/filter-telephone.wav",     // 2
-    "impulse-responses/comb-saw2.wav",            // 3
-    "impulse-responses/filter-rhythm1.wav",       // 4
-    "impulse-responses/filter-rhythm3.wav",       // 5
-    "impulse-responses/comb-saw1.wav",            // 6
-    "impulse-responses/comb-saw2.wav",            // 7
-    "impulse-responses/matrix-reverb2.wav",       // 8
-    "impulse-responses/matrix-reverb3.wav",       // 9
-    "impulse-responses/spatialized4.wav",         // 10
-
-    "impulse-responses/tim-warehouse/cardiod-rear-35-10/cardiod-rear-levelled.wav",          // 11
-
-    "impulse-responses/diffusor3.wav",            // 12
-    "impulse-responses/matrix6-backwards.wav",    // 13
-    "impulse-responses/bin_dfeq/s2_r4_bd.wav",    // 14
-    "impulse-responses/wildecho.wav",             // 15
-    "impulse-responses/impulse-rhythm2.wav",      // 16
-    "impulse-responses/spreader50-65ms.wav",      // 17
-    "impulse-responses/feedback-spring.wav",      // 18
-
-    "impulse-responses/house-impulses/kitchen.wav",                   // 19
-    "impulse-responses/house-impulses/kitchen-true-stereo.wav",       // 20
-    "impulse-responses/house-impulses/dining-living-true-stereo.wav", // 21
-    "impulse-responses/house-impulses/dining-far-kitchen.wav",        // 22
-
-    "impulse-responses/house-impulses/living-bedroom-leveled.wav",    // 23
-    "impulse-responses/filter-lopass160.wav"                          // 24
+    "music/1.mp3",       // 0
+    "music/2.mp3",    // 1
 ];
 
 var assetList = 0;
@@ -324,8 +289,8 @@ function init() {
 
     gainNode1 = context.createGainNode();
     gainNode2 = context.createGainNode();
-    gainNode1.gain.value = 1.0;
-    gainNode2.gain.value = 2.0;
+    gainNode1.gain.value = 10.0;
+    gainNode2.gain.value = 20.0;
 
     source.connect(gainNode1);
     gainNode1.connect(context.destination);
@@ -341,11 +306,6 @@ function init() {
     initPresets();
     presetList[0].load();
 }
-
-</script>
-</head>
-
-<body>
 
 <!-- Sliders and other controls will be added here -->
 <div id="controls"> </div>
