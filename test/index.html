@@ -49,6 +49,7 @@
 					alert('Web Audio API is not supported in this browser.');
 				}
 			}
+		}
 
 		function start(){
 			init();
@@ -62,7 +63,6 @@
 			gainNode.connect(context.destination);
 		}
 
-		}
 	</script>
 </head>
 <body onload="start();">
