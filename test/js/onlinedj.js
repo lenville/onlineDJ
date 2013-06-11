@@ -34,10 +34,11 @@ function createSource(buffer){
 
 function finishedLoading(bufferList) {	
 	//创建节点实例
-	var source1 = createSource(bufferList[0]);
+	var source1 ;
+	source1= createSource(bufferList[0]);
 	setvolumn(source1.gainNode, 100);
 	source1.start(0);
-	}
+}
 
 
 function setvolumn(gainNode, value){
