@@ -1,3 +1,5 @@
+var gainNode, filter, source;
+
 function web_audio_api_init(){
 	//初始化audiocontext
 	try{
@@ -10,9 +12,12 @@ function web_audio_api_init(){
 		}
 	}
 
+	//初始化audio音乐
+	source = context.createMediaElementSource(audio);
+
 	//建立增益/过滤器节点
-	var gainNode = context.createGainNode();
-	var filter = context.createBiquadFilter();
+	gainNode = context.createGainNode();
+	filter = context.createBiquadFilter();
 
 	source.loop = true;
 
@@ -26,12 +31,21 @@ source.setvol = function(vol){
 	gainNode.gain.value = vol;
 }
 //滤波器调节
-source.setfilter = function(type, frequency, q, gain){
-	filter.type = type;
-	filter.frequency.value = frequency;
-	filter.Q.value = q;
-	filter.gain.value = gain;
+source.setfilter = {
+	type: function(type){
+		filter.type = type;
+	},
+	frequency: function(frequency){
+		filter.frequency.value = frequency;
+	},
+	q: function(q){
+		filter.Q.value = q;
+	},
+	gain: function(gain){
+		filter.gain.value = gain;
+	}
 }
+
 //滤波器: 开
 source.addfilter = function(){
 	gainNode.connect(filter);
