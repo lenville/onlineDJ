@@ -281,6 +281,38 @@ a:focus {
     font-size: 32px;
 }
 
+#start{
+    padding:0;
+}
+
+#start .try {
+    font-size: 64px;
+    position: absolute;
+    top: -0.5em;
+    left: 1.5em;
+
+    -webkit-transform: translateZ(20px);
+    -moz-transform:    translateZ(20px);
+    -ms-transform:     translateZ(20px);
+    -o-transform:      translateZ(20px);
+    transform:         translateZ(20px);
+}
+
+#start h1 {
+    font-size: 150px;
+    text-align: center;
+
+    -webkit-transform: translateZ(50px);
+    -moz-transform:    translateZ(50px);
+    -ms-transform:     translateZ(50px);
+    -o-transform:      translateZ(50px);
+    transform:         translateZ(50px);
+}
+
+#start .footnote {
+    font-size: 32px;
+}
+
 /*
     Second step is nothing special, just a text with a link, so it doesn't need
     any special styling.
