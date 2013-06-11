@@ -258,8 +258,8 @@ function init() {
 
     gainNode1 = context.createGainNode();
     gainNode2 = context.createGainNode();
-    gainNode1.gain.value = 10.0;
-    gainNode2.gain.value = 20.0;
+    gainNode1.gain.value = 1.0;
+    gainNode2.gain.value = 2.0;
 
     source.connect(gainNode1);
     gainNode1.connect(context.destination);
