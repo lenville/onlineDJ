@@ -1,5 +1,4 @@
 window.onload  = init;
-+
 var context = new webkitAudioContext();//建立AudioContext实例,webKit核心的浏览器, 需要加上webkit前缀
 var compressor = context.createDynamicsCompressor();
 var bufferLoader;//创建AudioBuffer
