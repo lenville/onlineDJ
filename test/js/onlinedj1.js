@@ -19,6 +19,7 @@ bufferLoader.load();
 
 function finishedLoading(bufferList) {
 //创建两个实例并同时播放之
+console('123');
 var source1 = context.createBufferSource();
 var source2 = context.createBufferSource();
 source1.buffer = bufferList[0];
