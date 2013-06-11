@@ -24,7 +24,7 @@ var masterWet = 0;
 window.onload = setupRoutingGraph;
 
 function setupRoutingGraph () {
-    context = new AudioContext();
+    context = new webkitAudioContext();
 
     // Create the effects nodes.
     lowpassFilter = context.createBiquadFilter();
