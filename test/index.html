@@ -1,18 +1,367 @@
-<!DOCTYPE html>
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>
+Real-time Convolution Effects
+</title>
 
 
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>Hello World</title>
-  </head>
+<!-- Slider stuff -->
+<script type="text/javascript" src="lib/events.js"></script>
+<style type="text/css">
+  #slider { margin: 10px; }
+</style>
+
+<link rel="stylesheet" type="text/css" href="style/simple.css">
 
 
-  <body>
-    <h1>Hello World!</h1>
-    <button id="play" disabled>Play</button>
-    <label for="volume">Volume: <input type="range" min="0" max="100" id="volume" value="100"></label>
-<script type="application/dart" src="app.dart"></script>
-    <script src="http://dart.googlecode.com/svn/branches/bleeding_edge/dart/client/dart.js"></script>
-  </body>
-</html>
+<!-- Our javascript code -->
+<script type="text/javascript">
+
+// Events
+// init() once the page has finished loading.
+window.onload = init;
+
+var context = 0;
+var source = 0;
+var convolver = 0;
+var gainNode1 = 0;
+var gainNode2 = 0;
+
+// Source buffers
+var humanVoice = 0;
+var guitar = 0;
+
+var backwards = 0;
+var loadCount = 0;
+var hilightedElement = 0;
+
+var fileCount = 29;
+var responseOffset = 4;
+
+var fileList = [
+    "sounds/hyper-reality/human-voice.mp4",       // 0
+    "sounds/hyper-reality/obama-oilspill.mp4",    // 1
+    "sounds/drum-samples/conga-rhythm.wav",       // 2
+    "sounds/hyper-reality/br-jam-loop.wav",       // 3
+
+    // impulse responses
+    "impulse-responses/spatialized5.wav",         // 0
+    "impulse-responses/cosmic-ping-long.wav",     // 1
+    "impulse-responses/filter-telephone.wav",     // 2
+    "impulse-responses/comb-saw2.wav",            // 3
+    "impulse-responses/filter-rhythm1.wav",       // 4
+    "impulse-responses/filter-rhythm3.wav",       // 5
+    "impulse-responses/comb-saw1.wav",            // 6
+    "impulse-responses/comb-saw2.wav",            // 7
+    "impulse-responses/matrix-reverb2.wav",       // 8
+    "impulse-responses/matrix-reverb3.wav",       // 9
+    "impulse-responses/spatialized4.wav",         // 10
+
+    "impulse-responses/tim-warehouse/cardiod-rear-35-10/cardiod-rear-levelled.wav",          // 11
+
+    "impulse-responses/diffusor3.wav",            // 12
+    "impulse-responses/matrix6-backwards.wav",    // 13
+    "impulse-responses/bin_dfeq/s2_r4_bd.wav",    // 14
+    "impulse-responses/wildecho.wav",             // 15
+    "impulse-responses/impulse-rhythm2.wav",      // 16
+    "impulse-responses/spreader50-65ms.wav",      // 17
+    "impulse-responses/feedback-spring.wav",      // 18
+
+    "impulse-responses/house-impulses/kitchen.wav",                   // 19
+    "impulse-responses/house-impulses/kitchen-true-stereo.wav",       // 20
+    "impulse-responses/house-impulses/dining-living-true-stereo.wav", // 21
+    "impulse-responses/house-impulses/dining-far-kitchen.wav",        // 22
+
+    "impulse-responses/house-impulses/living-bedroom-leveled.wav",    // 23
+    "impulse-responses/filter-lopass160.wav"                          // 24
+];
+
+var assetList = 0;
+var presetList = 0;
+
+function getPreset(index) {
+    if (index < presetList.length)
+        return presetList[index];
+    return 0;
+}
+
+function Asset(url, index, type) {
+    this.url = url;
+    this.index = index;
+    this.type = type;
+    this.startedLoading = false;
+    this.loaded = false;
+    this.buffer = 0;
+    this.presetList = new Array();
+}
+
+Asset.prototype.load = function(preset) {
+    if (this.loaded) {
+        // Already loaded
+        preset.assetFinishedLoading(this);
+        return;
+    }
+
+    // Keep track of this preset as a dependency
+    var n = this.presetList.length;
+    this.presetList[n] = preset;
+    
+    if (this.startedLoading) {
+        return;
+    }
+
+    this.startedLoading = true;
+        
+    // Load asynchronously
+    var request = new XMLHttpRequest();
+    request.open("GET", this.url, true);
+    request.responseType = "arraybuffer";
+    this.request = request;
+    
+    var asset = this;
+
+    request.onload = function() {
+        // asset.buffer = request.buffer;
+        asset.buffer = context.createBuffer(request.response, false);
+        asset.loaded = true;
+
+        // Tell all the presets that depend on us that we're ready
+        for (i = 0; i < asset.presetList.length; i++) {
+            var preset = asset.presetList[i];
+            preset.assetFinishedLoading(asset);
+        }
+    }
+
+    request.send();
+}
+
+function Preset(presetIndex, title, sampleIndex, impulseResponseIndex, mainGain, sendGain) {
+    this.mainGain = mainGain;
+    this.sendGain = sendGain;
+
+    this.title = title;
+    this.divName = 'preset' + presetIndex;
+    this.presetIndex = presetIndex;
+    this.sampleIndex = sampleIndex;
+    this.impulseResponseIndex = impulseResponseIndex + responseOffset; // passed in index starts at 0 for responses
+    this.sampleBuffer = 0;
+    this.impulseResponseBuffer = 0;
+
+    // Add div for this preset
+    var presetListDiv = document.getElementById('presetList');
+
+    var presetDiv = '<div id="'
+    presetDiv += this.divName;
+    presetDiv += '">';
+    var s = this.generateDivString(false);
+    presetDiv += s;
+    presetDiv += '</div>';
+    presetListDiv.innerHTML += presetDiv;
+}
+
+Preset.prototype.div = function() {
+    var myDiv = document.getElementById(this.divName);
+    return myDiv;
+}
+
+Preset.prototype.generateDivString = function(isLoaded) {
+    var s = '<div class="bigList"';
+
+    if (isLoaded) {
+        s += ' onmousedown="presetList[';
+        s += this.presetIndex;
+        s += '].play(); highlightElement(this);"';
+    }
+
+    s += '>';
+
+    if (!isLoaded) {
+        s += '<img src="images/loading.gif">';
+    }
+
+    s += this.title;
+    s += '</div>';
+
+    return s;
+}
+
+Preset.prototype.assetFinishedLoading = function(asset) {
+    switch (asset.type) {
+        case 0: this.sampleBuffer = asset.buffer; break;
+        case 1: this.impulseResponseBuffer = asset.buffer; break;
+    }
+    
+    if (this.isFullyLoaded()) {
+        // Remove loading animation
+        var div = document.getElementById(this.divName);
+        var s = this.generateDivString(true);
+        div.innerHTML = s;
+        
+        var nextPreset = getPreset(this.presetIndex + 1);
+        if (nextPreset) {
+            nextPreset.load();
+        }
+        
+        // Autoplay first preset
+        if (this.presetIndex == 0) {
+            this.play();
+            highlightElement(this.div());
+        }
+    }
+}
+
+Preset.prototype.isFullyLoaded = function() {
+    return this.sampleBuffer && this.impulseResponseBuffer;
+}
+
+Preset.prototype.load = function() {
+    sampleAsset = assetList[this.sampleIndex];
+    impulseResponseAsset = assetList[this.impulseResponseIndex];
+    
+    sampleAsset.load(this);
+    impulseResponseAsset.load(this);    
+}
+
+Preset.prototype.play = function() {
+    source.buffer = this.sampleBuffer;
+    convolver.buffer = this.impulseResponseBuffer;
+
+    gainNode1.gain.value = this.mainGain;
+    gainNode2.gain.value = this.sendGain;
+
+    source.noteOn(0);
+}
+
+function highlightElement(object) {
+    if (hilightedElement) hilightedElement.style.backgroundColor = "white";
+    hilightedElement = object;
+
+    object.style.backgroundColor = "green";
+}
+
+function initAssets() {
+    assetList = new Array();
+    
+    for (i = 0; i < fileList.length; i++) {
+        var type = i < responseOffset ? 0 : 1;
+        assetList[i] = new Asset(fileList[i], i, type);
+    }
+}
+
+function initPresets() {
+    presetList = new Array();
+    
+    var n = 0;
+    
+    presetList[n] = new Preset(n++, 'Spoken Word (unprocessed)', 0, 0, 0.35, 0.0);
+    presetList[n] = new Preset(n++, 'Spoken Word (spreader)', 0, 17, 0.2, 0.5);
+    presetList[n] = new Preset(n++, 'Spoken Word (telephone filter)', 0, 2, 0.0, 1.0);
+    presetList[n] = new Preset(n++, 'Spoken Word (lowpass filter)', 0, 24, 0.0, 0.3);
+    presetList[n] = new Preset(n++, 'Spoken Word (spring reverb simulation)', 0, 18, 0.0, 0.8);
+    presetList[n] = new Preset(n++, 'Spoken Word (comb filter 1)', 0, 6, 0.0, 0.7);
+    presetList[n] = new Preset(n++, 'Spoken Word (comb filter 2)', 0, 7, 0.0, 0.7);
+    
+    presetList[n] = new Preset(n++, 'Spoken Word (wild echo)', 0, 15, 0.0, 1.0);
+    presetList[n] = new Preset(n++, 'Spoken Word (chorus rhythm)', 0, 16, 0.25, 1.25);
+    presetList[n] = new Preset(n++, 'Spoken Word (backwards)', 0, 0, 0.0, 0.4);
+    
+    presetList[n] = new Preset(n++, 'Spoken Word (extreme backwards - be patient!)', 0, 13, 0.0, 0.5);
+    presetList[n] = new Preset(n++, 'Spoken Word (real warehouse)', 0, 11, 0.15, 0.5);
+    presetList[n] = new Preset(n++, 'Spoken Word (real binaurally recorded hall)', 0, 14, 0.3, 0.5);
+    presetList[n] = new Preset(n++, 'Spoken Word (matrix reverb)', 0, 9, 0.3, 0.8);
+    presetList[n] = new Preset(n++, 'Spoken Word (synthetic dense hall)', 0, 10, 0.2, 0.2);
+    presetList[n] = new Preset(n++, 'Spoken Word (real living-bedroom)', 0, 23, 0.2, 0.8);
+
+    presetList[n] = new Preset(n++, 'Congas (unprocessed)', 2, 2, 0.3, 0.0);
+    presetList[n] = new Preset(n++, 'Congas (filter rhythm 1)', 2, 4, 0.2, 0.5);
+    presetList[n] = new Preset(n++, 'Congas (filter rhythm 2)', 2, 5, 0.25, 0.5);
+    presetList[n] = new Preset(n++, 'Congas (comb filter 2)', 2, 7, 0.0, 0.5);
+    presetList[n] = new Preset(n++, 'Congas (spring reverb simulation)', 2, 18, 0.1, 0.3);
+    presetList[n] = new Preset(n++, 'Congas (telephone filter)', 2, 2, 0.0, 0.6);
+    presetList[n] = new Preset(n++, 'Congas (real warehouse)', 2, 11, 0.1, 0.3);
+    presetList[n] = new Preset(n++, 'Congas (real binaurally recorded hall)', 2, 14, 0.2, 0.2);
+    presetList[n] = new Preset(n++, 'Congas (spreader)', 2, 17, 0.15, 0.3);
+    presetList[n] = new Preset(n++, 'Congas (matrix reverb 2)', 2, 8, 0.2, 0.3);
+    presetList[n] = new Preset(n++, 'Congas (matrix reverb 3)', 2, 9, 0.2, 0.3);
+    presetList[n] = new Preset(n++, 'Congas (synthetic dense hall)', 2, 10, 0.2, 0.07);
+    presetList[n] = new Preset(n++, 'Congas (synthetic diffusor)', 2, 12, 0.2, 0.2);
+
+    presetList[n] = new Preset(n++, 'Obama (unprocessed)', 1, 0, 0.35, 0.0);
+    presetList[n] = new Preset(n++, 'Obama (spreader)', 1, 17, 0.2, 0.5);
+    presetList[n] = new Preset(n++, 'Obama (telephone filter)', 1, 2, 0.0, 1.0);
+    presetList[n] = new Preset(n++, 'Obama (lowpass filter)', 1, 24, 0.0, 0.3);
+    presetList[n] = new Preset(n++, 'Obama (spring reverb simulation)', 1, 18, 0.0, 0.8);
+    presetList[n] = new Preset(n++, 'Obama (comb filter 1)', 1, 6, 0.0, 0.7);
+    presetList[n] = new Preset(n++, 'Obama (comb filter 2)', 1, 7, 0.0, 0.7);
+    presetList[n] = new Preset(n++, 'Obama (wild echo)', 1, 15, 0.0, 1.0);
+    presetList[n] = new Preset(n++, 'Obama (chorus rhythm)', 1, 16, 0.25, 1.25);
+    presetList[n] = new Preset(n++, 'Obama (backwards)', 1, 0, 0.0, 0.4);
+    presetList[n] = new Preset(n++, 'Obama (extreme backwards - be patient!)', 1, 13, 0.0, 0.5);
+    presetList[n] = new Preset(n++, 'Obama (real warehouse)', 1, 11, 0.15, 0.5);
+    presetList[n] = new Preset(n++, 'Obama (real binaurally recorded hall)', 1, 14, 0.3, 0.5);
+    presetList[n] = new Preset(n++, 'Obama (matrix reverb)', 1, 9, 0.3, 0.8);
+    presetList[n] = new Preset(n++, 'Obama (synthetic dense hall)', 1, 10, 0.2, 0.2);
+    presetList[n] = new Preset(n++, 'Obama (real living-bedroom)', 1, 23, 0.2, 0.8);
+
+    presetList[n] = new Preset(n++, 'Dumbek (unprocessed)', 3, 2, 0.5, 0.0);
+    presetList[n] = new Preset(n++, 'Dumbek (real warehouse)', 3, 11, 0.2, 0.3);
+    presetList[n] = new Preset(n++, 'Dumbek (real binaurally recorded hall)', 3, 14, 0.4, 0.2);
+    presetList[n] = new Preset(n++, 'Dumbek (backwards)', 3, 0, 0.0, 0.7);
+    presetList[n] = new Preset(n++, 'Dumbek (comb filter 2)', 3, 7, 0.0, 0.5);
+    presetList[n] = new Preset(n++, 'Dumbek (wild echo)', 3, 15, 0.0, 0.7);
+    presetList[n] = new Preset(n++, 'Dumbek (real kitchen-true-stereo)', 3, 20, 0.2, 1.0);
+    presetList[n] = new Preset(n++, 'Dumbek (real dining-living-true-stereo)', 3, 21, 0.2, 1.0);
+    presetList[n] = new Preset(n++, 'Dumbek (real dining-far-kitchen)', 3, 22, 0.2, 1.0);
+    presetList[n] = new Preset(n++, 'Dumbek (real dining-far-bedroom)', 3, 22, 0.2, 1.0);
+    presetList[n] = new Preset(n++, 'Dumbek (real living-bedroom)', 3, 23, 0.2, 0.7);
+}
+
+function init() {
+    context = new webkitAudioContext();
+    
+    convolver = context.createConvolver();
+    source = context.createBufferSource();
+
+    gainNode1 = context.createGainNode();
+    gainNode2 = context.createGainNode();
+    gainNode1.gain.value = 1.0;
+    gainNode2.gain.value = 2.0;
+
+    source.connect(gainNode1);
+    gainNode1.connect(context.destination);
+    
+    source.connect(convolver);
+    convolver.connect(gainNode2);
+    gainNode2.connect(context.destination);
+
+    source.looping = true;
+
+    // Start loading
+    initAssets();
+    initPresets();
+    presetList[0].load();
+}
+
+</script>
+</head>
+
+<body>
+
+<!-- Sliders and other controls will be added here -->
+<div id="controls"> </div>
+
+<!-- Initial loading animation 
+<div id="loading">
+<img src="images/loading.gif">
+</div>
+-->
+
+<h1> Real-time Convolution Effects </h1>
+
+<p>
+The following illustrate a diverse range of effects which are possible using the convolution engine:
+</p>
+
+<!-- Information -->
+<div id="presetList"> <div id="preset0" style="background-color: white;"><div class="bigList" onmousedown="presetList[0].play(); highlightElement(this);">Spoken Word (unprocessed)</div></div><div id="preset1"><div class="bigList" onmousedown="presetList[1].play(); highlightElement(this);" style="background-color: white;">Spoken Word (spreader)</div></div><div id="preset2"><div class="bigList" onmousedown="presetList[2].play(); highlightElement(this);">Spoken Word (telephone filter)</div></div><div id="preset3"><div class="bigList" onmousedown="presetList[3].play(); highlightElement(this);">Spoken Word (lowpass filter)</div></div><div id="preset4"><div class="bigList" onmousedown="presetList[4].play(); highlightElement(this);" style="background-color: green;">Spoken Word (spring reverb simulation)</div></div><div id="preset5"><div class="bigList" onmousedown="presetList[5].play(); highlightElement(this);">Spoken Word (comb filter 1)</div></div><div id="preset6"><div class="bigList" onmousedown="presetList[6].play(); highlightElement(this);">Spoken Word (comb filter 2)</div></div><div id="preset7"><div class="bigList" onmousedown="presetList[7].play(); highlightElement(this);" style="background-color: white;">Spoken Word (wild echo)</div></div><div id="preset8"><div class="bigList" onmousedown="presetList[8].play(); highlightElement(this);">Spoken Word (chorus rhythm)</div></div><div id="preset9"><div class="bigList" onmousedown="presetList[9].play(); highlightElement(this);" style="background-color: white;">Spoken Word (backwards)</div></div><div id="preset10"><div class="bigList" onmousedown="presetList[10].play(); highlightElement(this);">Spoken Word (extreme backwards - be patient!)</div></div><div id="preset11"><div class="bigList" onmousedown="presetList[11].play(); highlightElement(this);">Spoken Word (real warehouse)</div></div><div id="preset12"><div class="bigList" onmousedown="presetList[12].play(); highlightElement(this);">Spoken Word (real binaurally recorded hall)</div></div><div id="preset13"><div class="bigList" onmousedown="presetList[13].play(); highlightElement(this);" style="background-color: white;">Spoken Word (matrix reverb)</div></div><div id="preset14"><div class="bigList" onmousedown="presetList[14].play(); highlightElement(this);">Spoken Word (synthetic dense hall)</div></div><div id="preset15"><div class="bigList" onmousedown="presetList[15].play(); highlightElement(this);">Spoken Word (real living-bedroom)</div></div><div id="preset16"><div class="bigList" onmousedown="presetList[16].play(); highlightElement(this);">Congas (unprocessed)</div></div><div id="preset17"><div class="bigList" onmousedown="presetList[17].play(); highlightElement(this);">Congas (filter rhythm 1)</div></div><div id="preset18"><div class="bigList" onmousedown="presetList[18].play(); highlightElement(this);">Congas (filter rhythm 2)</div></div><div id="preset19"><div class="bigList" onmousedown="presetList[19].play(); highlightElement(this);">Congas (comb filter 2)</div></div><div id="preset20"><div class="bigList" onmousedown="presetList[20].play(); highlightElement(this);">Congas (spring reverb simulation)</div></div><div id="preset21"><div class="bigList" onmousedown="presetList[21].play(); highlightElement(this);">Congas (telephone filter)</div></div><div id="preset22"><div class="bigList" onmousedown="presetList[22].play(); highlightElement(this);">Congas (real warehouse)</div></div><div id="preset23"><div class="bigList" onmousedown="presetList[23].play(); highlightElement(this);">Congas (real binaurally recorded hall)</div></div><div id="preset24"><div class="bigList" onmousedown="presetList[24].play(); highlightElement(this);">Congas (spreader)</div></div><div id="preset25"><div class="bigList" onmousedown="presetList[25].play(); highlightElement(this);">Congas (matrix reverb 2)</div></div><div id="preset26"><div class="bigList" onmousedown="presetList[26].play(); highlightElement(this);">Congas (matrix reverb 3)</div></div><div id="preset27"><div class="bigList" onmousedown="presetList[27].play(); highlightElement(this);">Congas (synthetic dense hall)</div></div><div id="preset28"><div class="bigList" onmousedown="presetList[28].play(); highlightElement(this);">Congas (synthetic diffusor)</div></div><div id="preset29"><div class="bigList" onmousedown="presetList[29].play(); highlightElement(this);">Obama (unprocessed)</div></div><div id="preset30"><div class="bigList" onmousedown="presetList[30].play(); highlightElement(this);">Obama (spreader)</div></div><div id="preset31"><div class="bigList" onmousedown="presetList[31].play(); highlightElement(this);">Obama (telephone filter)</div></div><div id="preset32"><div class="bigList" onmousedown="presetList[32].play(); highlightElement(this);">Obama (lowpass filter)</div></div><div id="preset33"><div class="bigList" onmousedown="presetList[33].play(); highlightElement(this);">Obama (spring reverb simulation)</div></div><div id="preset34"><div class="bigList" onmousedown="presetList[34].play(); highlightElement(this);">Obama (comb filter 1)</div></div><div id="preset35"><div class="bigList" onmousedown="presetList[35].play(); highlightElement(this);">Obama (comb filter 2)</div></div><div id="preset36"><div class="bigList" onmousedown="presetList[36].play(); highlightElement(this);">Obama (wild echo)</div></div><div id="preset37"><div class="bigList" onmousedown="presetList[37].play(); highlightElement(this);">Obama (chorus rhythm)</div></div><div id="preset38"><div class="bigList" onmousedown="presetList[38].play(); highlightElement(this);">Obama (backwards)</div></div><div id="preset39"><div class="bigList" onmousedown="presetList[39].play(); highlightElement(this);">Obama (extreme backwards - be patient!)</div></div><div id="preset40"><div class="bigList" onmousedown="presetList[40].play(); highlightElement(this);">Obama (real warehouse)</div></div><div id="preset41"><div class="bigList" onmousedown="presetList[41].play(); highlightElement(this);">Obama (real binaurally recorded hall)</div></div><div id="preset42"><div class="bigList" onmousedown="presetList[42].play(); highlightElement(this);">Obama (matrix reverb)</div></div><div id="preset43"><div class="bigList" onmousedown="presetList[43].play(); highlightElement(this);">Obama (synthetic dense hall)</div></div><div id="preset44"><div class="bigList" onmousedown="presetList[44].play(); highlightElement(this);">Obama (real living-bedroom)</div></div><div id="preset45"><div class="bigList" onmousedown="presetList[45].play(); highlightElement(this);">Dumbek (unprocessed)</div></div><div id="preset46"><div class="bigList" onmousedown="presetList[46].play(); highlightElement(this);">Dumbek (real warehouse)</div></div><div id="preset47"><div class="bigList" onmousedown="presetList[47].play(); highlightElement(this);">Dumbek (real binaurally recorded hall)</div></div><div id="preset48"><div class="bigList" onmousedown="presetList[48].play(); highlightElement(this);">Dumbek (backwards)</div></div><div id="preset49"><div class="bigList" onmousedown="presetList[49].play(); highlightElement(this);">Dumbek (comb filter 2)</div></div><div id="preset50"><div class="bigList" onmousedown="presetList[50].play(); highlightElement(this);">Dumbek (wild echo)</div></div><div id="preset51"><div class="bigList" onmousedown="presetList[51].play(); highlightElement(this);">Dumbek (real kitchen-true-stereo)</div></div><div id="preset52"><div class="bigList" onmousedown="presetList[52].play(); highlightElement(this);">Dumbek (real dining-living-true-stereo)</div></div><div id="preset53"><div class="bigList" onmousedown="presetList[53].play(); highlightElement(this);">Dumbek (real dining-far-kitchen)</div></div><div id="preset54"><div class="bigList" onmousedown="presetList[54].play(); highlightElement(this);">Dumbek (real dining-far-bedroom)</div></div><div id="preset55"><div class="bigList" onmousedown="presetList[55].play(); highlightElement(this);">Dumbek (real living-bedroom)</div></div></div>
+</body></html>
