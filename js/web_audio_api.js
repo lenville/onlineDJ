@@ -24,36 +24,37 @@ function web_audio_api_init(){
 	//绑定音量调节节点
 	source.connect(gainNode);
 	gainNode.connect(context.destination);
-}
 
-//音量调节
-source.setvol = function(vol){
-	gainNode.gain.value = vol;
-}
-//滤波器调节
-source.setfilter = {
-	type: function(type){
-		filter.type = type;
-	},
-	frequency: function(frequency){
-		filter.frequency.value = frequency;
-	},
-	q: function(q){
-		filter.Q.value = q;
-	},
-	gain: function(gain){
-		filter.gain.value = gain;
+	//音量调节
+	source.setvol = function(vol){
+		gainNode.gain.value = vol;
+	}
+	//滤波器调节
+	source.setfilter = {
+		type: function(type){
+			filter.type = type;
+		},
+		frequency: function(frequency){
+			filter.frequency.value = frequency;
+		},
+		q: function(q){
+			filter.Q.value = q;
+		},
+		gain: function(gain){
+			filter.gain.value = gain;
+		}
+	}
+
+	//滤波器: 开
+	source.addfilter = function(){
+		gainNode.connect(filter);
+		filter.connect(context.destination);
+	}
+	//滤波器: 关
+	source.removefilter = function(){
+		gainNode.disconnect(0);
+		filter.disconnect(0);
+		gainNode.connect(context.destination);
 	}
 }
 
-//滤波器: 开
-source.addfilter = function(){
-	gainNode.connect(filter);
-	filter.connect(context.destination);
-}
-//滤波器: 关
-source.removefilter = function(){
-	gainNode.disconnect(0);
-	filter.disconnect(0);
-	gainNode.connect(context.destination);
-}
