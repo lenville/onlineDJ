@@ -139,11 +139,6 @@ Preset.prototype.generateDivString = function(isLoaded) {
     }
 
     s += '>';
-
-    if (!isLoaded) {
-        s += '<img src="images/loading.gif">';
-    }
-
     s += this.title;
     s += '</div>';
 
@@ -286,8 +281,6 @@ function init() {
 <h1> Real-time Convolution Effects </h1>
 <!-- Information -->
 <div id="presetList">
-    <div id="preset0" style="background-color: white;">
-        <div class="bigList" onmousedown="presetList[0].play(); highlightElement(this);">test</div>
 </div>
 </div>
 
