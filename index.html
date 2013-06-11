@@ -10,18 +10,53 @@
 </head>
 <body>
 	<aside class="left span3">
-		<dl>	
+		<dl>
 			<dt>
-				音量调节
+				<input type="button" id='play' class="btn span1" value="开始">
+				<input type="button" id='stop' class="btn span1" value="停止">
+			</dt>
+			<dt>
+				音乐音量调节
 			</dt>
 			<dd>
-				<input type="range" id="vulumn" value="100" min="0" max="100" step="5">
+				<input type="range" id="volume" value="100" min="0" max="100" step="1">
+			</dd>
+			<dt>
+				擦盘音量调节
+			</dt>
+			<dd>
+				<input type="range" id="rubvolume" value="50" min="0" max="100" step="1">
 			</dd>
 			<dt>
 				滤波器
 			</dt>
 			<dd>
-				<input type="range" id="filter" value="0" min="0" max="100" step="5">
+				<input type="button" class="btn btn-small" id="lowpass" value="低通">
+				<input type="button" class="btn btn-small" id="highpass" value="高通">
+			</dd>
+			<dd>
+				<input type="button" class="btn btn-small" id="bandpass" value="带通">
+				<input type="button" class="btn btn-small" id="allpass" value="全通">
+			</dd>
+			<dd>
+				<input type="button" class="btn btn-small" id="lowshelf" value="低架">
+				<input type="button" class="btn btn-small" id="highshelf" value="高架">
+			</dd>
+			<dd>
+				<input type="button" class="btn btn-small" id="peaking" value="峰值">
+				<input type="button" class="btn btn-small" id="notch" value="陷波">
+			</dd>
+			<dd>
+				<small>频率</small>
+				<input type="range" id="frequency" value="1" min="0" max="5" step="1">
+			</dd>
+			<dd>
+				<small>质量因子</small>
+				<input type="range" id="q" value="1" min="0" max="1" step="0.1">
+			</dd>
+			<dd>
+				<small>滤波音量</small>
+				<input type="range" id="filtergain" value="50" min="0" max="100" step="1">
 			</dd>
 		</dl>
 	</aside>
@@ -33,11 +68,9 @@
 			</div>
 			<div class="tonearm"></div>
 			<div class="startstop"></div>
-			<div class="volumnup"></div>
-			<div class="volumndown"></div>
-			<div class="cover">
-				<div class="volumnup"></div>
-				<div class="volumndown"></div>
+			<div class="volumeup"></div>
+			<div class="volumedown"></div>
+			<div class="cover" draggable="false">
 			</div>
 		</div>
 	</div>

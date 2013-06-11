@@ -13,20 +13,31 @@ body{
 .left dl dd{
 	margin-bottom: 20px;
 }
+.left #play , .left #stop{
+	margin: 5px;
+	margin-left: 35px;
+}
+.left .btn-small{
+	margin: 5px 0 0 35px;
+}
 
 .right{
 	margin-top: 47px;
-	padding-left: 27px;
+	padding: 0 15px;
 	border: 2px solid #AAA9A9;
 	border-radius: 10px; 
 	box-shadow: 0 0 25px #fff;
 	background: #C8C8C8;
 }
 .right .musiclist{
+	cursor: pointer;
+	padding: 5px;
 	height: 55px;
 	margin: 10px auto; 
 }
-
+.right .musiclist:hover{
+	background: #A09E9F;
+}
 .shadow{
 	margin-top: 20px;
 	height: 500px;
@@ -77,21 +88,21 @@ body{
 	height: 36px;
 	background: url('../image/table_startstop.png') no-repeat;
 }
-.shadow .table .volumndown{
+.shadow .table .volumedown{
 	position: relative;
 	left: 66px;
 	top: 309px;
 	width: 25px;
 	height: 7px;
-	background: url('../image/table_volumn_down.png') no-repeat;
+	background: url('../image/table_volume_down.png') no-repeat;
 }
-.shadow .table .volumnup{
+.shadow .table .volumeup{
 	position: relative;
 	left:95px;
 	top: 316px;
 	width: 25px;
 	height: 7px;
-	background: url('../image/table_volumn_up.png') no-repeat;
+	background: url('../image/table_volume_up.png') no-repeat;
 }
 .shadow .table .cover{
 	cursor: pointer;
@@ -101,8 +112,15 @@ body{
 	height: 413px;
 	width: 500px;
 }
-
-.shadow .table .cover .volumndown{
+.shadow .table .cover .startstop{
+	position: absolute;
+	left: 13px;
+	top: 323px;
+	width: 46px;
+	height: 36px;
+	background: none;
+}
+.shadow .table .cover .volumedown{
 	position: absolute;
 	left:66px;
 	top: 352px;
@@ -110,7 +128,7 @@ body{
 	height: 7px;
 	background: none;
 }
-.shadow .table .cover .volumnup{
+.shadow .table .cover .volumeup{
 	position: absolute;
 	left:95px;
 	top: 351px;
