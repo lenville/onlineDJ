@@ -30,6 +30,15 @@
 				gainNode.gain.value = vol;
 			}
 			//source.setvol(0.5);
+
+			source.setfilter = function(frequency, q, gain){
+				filter.frequency.value = frequency;
+				filter.Q.value = q;
+				filter.gain.value = gain;
+			}
+			source.setfilter(440, 1, 0);
+
+			
 		}
 
 
