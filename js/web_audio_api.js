@@ -1,4 +1,4 @@
-function init(){
+function web_audio_api_init(){
 	//初始化audiocontext
 	try{
 		context = new AudioContext();
@@ -9,18 +9,17 @@ function init(){
 			alert('Web Audio API is not supported in this browser.');
 		}
 	}
+
+	//建立增益/过滤器节点
+	var gainNode = context.createGainNode();
+	var filter = context.createBiquadFilter();
+
+	source.loop = true;
+
+	//绑定音量调节节点
+	source.connect(gainNode);
+	gainNode.connect(context.destination);
 }
-
-//建立增益/过滤器节点
-var gainNode = context.createGainNode();
-var filter = context.createBiquadFilter();
-
-source.loop = true;
-
-//绑定音量调节节点
-source.connect(gainNode);
-gainNode.connect(context.destination);
-
 
 //音量调节
 source.setvol = function(vol){
