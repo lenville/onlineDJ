@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Oscillator Test</title>
+	<script>
+		try{
+			context = new AudioContext();
+		}catch(e){
+			try{
+				context = new webkitAudioContext();
+			}catch(e){
+				alert('Web Audio API is not supported in this browser.');
+			}
+		}
+		
+		var wavetable =  context.createWaveTable;
+	
+	</script>
+</head>
+<body>
+	
+</body>
+</html>
