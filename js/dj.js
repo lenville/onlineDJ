@@ -1,22 +1,48 @@
 var audio;
 var touch_arr = [];
-var dj = {
-	start: function (name){
+
+//每转一圈所需时间（单位：秒）
+var ptime = 5;
+//定时器控制器
+var p = 1;
+
+var dj = {	
+	//定时器
+	interval: function (fn,time){
+		setTimeout(function(){
+			fn();
+			setTimeout(arguments.callee, time);
+		}, time)
+	}
+	,start: function (name){
+		var that = this
+		,reg = /\-?[0-9]+\.?[0-9]*/g ;
 		$('body')[0].style.height = document.documentElement.clientHeight;
 		audio = new Audio('music/'+name+'.mp3');
 		audio.addEventListener('canplaythrough', function(){
 			audio.play();
+			that.interval(fn,30);
 		},false)
+		var pdeg = 360/(ptime/0.03);
+		function fn (){
+			var rotate = $('.logo')[0].style.webkitTransform.match(reg)[0];
+			if(p == 1)
+			$('.logo')[0].style.webkitTransform = 'rotate('+(parseInt(rotate)+pdeg)+'deg)';
+		}
 	}
 	,rub: function() {
 		var baseX , baseY
-		,height = document.documentElement.clientHeight
-		,width = document.documentElement.clientWidth
+		,height = $('.cover')[0].clientHeight
+		,width = $('.cover')[0].clientWidth
 		,reg = /\-?[0-9]+\.?[0-9]*/g ;
+
+		
+		/*
 		document.addEventListener('touchstart',function(){
 			baseX = event.touches[0].clientX;
 			baseY = event.touches[0].clientY;
 			//if(x>300&&x<600&&y>300&&y<600){
+				p =0;
 				audio.pause();
 				touch_arr = [];
 				touch_arr.push([baseX,baseY]);
@@ -25,94 +51,151 @@ var dj = {
 		document.addEventListener('touchmove',function(){
 			var x = event.changedTouches[0].clientX
 			,y = event.changedTouches[0].clientY;
+			touch_arr.push([x,y])
+			var len = touch_arr.length - 2
+			//console.log(len);
+			,rotate = $('.logo')[0].style.webkitTransform.match(reg)[0]
+			//每次转动角度
+			,pdeg_1 = (x-touch_arr[len][0]+y-touch_arr[len][1])/7
+			,pdeg_2 = (-x+touch_arr[len][0]+y-touch_arr[len][1])/7
+			,pdeg_3 = (-x+touch_arr[len][0]-y+touch_arr[len][1])/7
+			,pdeg_4 = (x-touch_arr[len][0]-y+touch_arr[len][1])/7
+			//每次改变音轨时间长度
+			,pchtime_1 = ptime*(pdeg_1/360)*12
+			,pchtime_2 = ptime*(pdeg_2/360)*12
+			,pchtime_3 = ptime*(pdeg_3/360)*12
+			,pchtime_4 = ptime*(pdeg_4/360)*12;
+
 			//audio.currentTime += x/100;
 			//audio.currentTime += y/100;
 
 			//判定擦盘位置，旋转擦盘，改变音轨
+			//console.log(x+'<br>'+y);
 			
-			touch_arr.push([x,y]);
-			var len = touch_arr.length - 2;
-			var rotate = $('.logo')[0].style.webkitTransform.match(reg);
-			if(touch_arr[len][0]>width/2&&touch_arr[len][1]<height/2){
+			if((touch_arr[len][0]>width/2)&&(touch_arr[len][1]<height/2)){
 				//右上角
-				$('.logo')[0].style.webkitTransform = 'rotate('+rotate+(x-touch_arr[len][0]+y-touch_arr[len][1])/10+'deg)';
-				audio.currentTime += (x-touch_arr[len][0])/30;
-				audio.currentTime += (y-touch_arr[len][1])/30;
+				$('.logo')[0].style.webkitTransform = 'rotate('+(parseInt(rotate)+pdeg_1)+'deg)';
+				if(len%8 == 1){
+					audio.currentTime += pchtime_1;
+					//console.log(audio.currentTime);
+				}
+				
 			}
-			else if(touch_arr[len][0]>width/2&&touch_arr[len][1]>height/2){
+			else if((touch_arr[len][0]>width/2)&&(touch_arr[len][1]>height/2)){
 				//右下角
-				$('.logo')[0].style.webkitTransform = 'rotate('+rotate+(-x+touch_arr[len][0]+y-touch_arr[len][1])/10+'deg)';
-				audio.currentTime -= (x-touch_arr[len][0])/30;
-				audio.currentTime += (y-touch_arr[len][1])/30;
+				$('.logo')[0].style.webkitTransform = 'rotate('+(parseInt(rotate)+pdeg_2)+'deg)';
+				if(len%8 == 1){
+					audio.currentTime += pchtime_2;
+					//console.log(audio.currentTime);
+				}
+				
 			}
-			else if(touch_arr[len][0]<width/2&&touch_arr[len][1]>height/2){
+			else if((touch_arr[len][0]<width/2)&&(touch_arr[len][1]>height/2)){
 				//左下角
-				$('.logo')[0].style.webkitTransform = 'rotate('+rotate+(-x+touch_arr[len][0]-y+touch_arr[len][1])/10+'deg)';
-				audio.currentTime -= (x-touch_arr[len][0])/30;
-				audio.currentTime -= (y-touch_arr[len][1])/30;
+				$('.logo')[0].style.webkitTransform = 'rotate('+(parseInt(rotate)+pdeg_3)+'deg)';
+				if(len%8 == 1){
+					audio.currentTime += pchtime_3;
+					//console.log(audio.currentTime);
+				}
 			}
-			else if(touch_arr[len][0]<width/2&&touch_arr[len][1]<height/2){
+			else if((touch_arr[len][0]<width/2)&&(touch_arr[len][1]<height/2)){
 				//左上角
-				$('.logo')[0].style.webkitTransform = 'rotate('+rotate+(x-touch_arr[len][0]-y+touch_arr[len][1])/10+'deg)';
-				audio.currentTime += (x-touch_arr[len][0])/30;
-				audio.currentTime -= (y-touch_arr[len][1])/30;
+				$('.logo')[0].style.webkitTransform = 'rotate('+(parseInt(rotate)+pdeg_4)+'deg)';
+				if(len%8 == 1){
+					audio.currentTime += pchtime_4;
+					//console.log(audio.currentTime);
+				}
 			}
 			//document.write(x+'<br>'+y+'<br>'+audio.currentTime);
 		},false)
 		document.addEventListener('touchend',function(){
+			p = 1;
 			audio.play();
 		},false)
-		/*
-		document.body.addEventListener('mousedown',function(){
-			baseX = event.clientX;
-			baseY = event.clientY;
+		*/
+		
+		
+
+		$('.cover').bind('mousedown',function(){
+			baseX = event.clientX - $('.table')[0].offsetLeft;
+			baseY = event.clientY - $('.table')[0].offsetTop;
+			//console.log(event.clientX);
 			//if(x>300&&x<600&&y>300&&y<600){
+				p = 0;
 				audio.pause();
 				touch_arr = [];
 				touch_arr.push([baseX,baseY]);
 			//}
-		},false)
-		document.body.addEventListener('mousemove',function(){
-			var x = event.clientX
-			,y = event.clientY;
+			$('.cover').bind('mousemove', turn);
+		})
+		
+		function turn (ev){
+			var x = ev.clientX - $('.table')[0].offsetLeft
+			,y = ev.clientY - $('.table')[0].offsetTop;
+			touch_arr.push([x,y])
+			var len = touch_arr.length - 2
+			//console.log(len);
+			,rotate = $('.logo')[0].style.webkitTransform.match(reg)[0]
+			//每次转动角度
+			,pdeg_1 = (x-touch_arr[len][0]+y-touch_arr[len][1])/7
+			,pdeg_2 = (-x+touch_arr[len][0]+y-touch_arr[len][1])/7
+			,pdeg_3 = (-x+touch_arr[len][0]-y+touch_arr[len][1])/7
+			,pdeg_4 = (x-touch_arr[len][0]-y+touch_arr[len][1])/7
+			//每次改变音轨时间长度
+			,pchtime_1 = ptime*(pdeg_1/360)*12
+			,pchtime_2 = ptime*(pdeg_2/360)*12
+			,pchtime_3 = ptime*(pdeg_3/360)*12
+			,pchtime_4 = ptime*(pdeg_4/360)*12;
+
 			//audio.currentTime += x/100;
 			//audio.currentTime += y/100;
 
 			//判定擦盘位置，旋转擦盘，改变音轨
-			console.log(x+'<br>'+y);
-			touch_arr.push([x,y]);
-			var len = touch_arr.length - 2;
-			var rotate = $('.logo')[0].style.webkitTransform.match(reg);
-			if(touch_arr[len][0]>width/2&&touch_arr[len][1]<height/2){
+			//console.log(x+'<br>'+y);
+			
+			if((touch_arr[len][0]>width/2)&&(touch_arr[len][1]<height/2)){
 				//右上角
-				$('.logo')[0].style.webkitTransform = 'rotate('+(rotate+x-touch_arr[len][0]+y-touch_arr[len][1])/20+'deg)';
-				audio.currentTime += (x-touch_arr[len][0])/5;
-				audio.currentTime += (y-touch_arr[len][1])/5;
+				$('.logo')[0].style.webkitTransform = 'rotate('+(parseInt(rotate)+pdeg_1)+'deg)';
+				if(len%8 == 1){
+					audio.currentTime += pchtime_1;
+					//console.log(audio.currentTime);
+				}
+				
 			}
-			else if(touch_arr[len][0]>width/2&&touch_arr[len][1]>height/2){
+			else if((touch_arr[len][0]>width/2)&&(touch_arr[len][1]>height/2)){
 				//右下角
-				$('.logo')[0].style.webkitTransform = 'rotate('+(rotate-x+touch_arr[len][0]+y-touch_arr[len][1])/20+'deg)';
-				audio.currentTime -= (x-touch_arr[len][0])/5;
-				audio.currentTime += (y-touch_arr[len][1])/5;
+				$('.logo')[0].style.webkitTransform = 'rotate('+(parseInt(rotate)+pdeg_2)+'deg)';
+				if(len%8 == 1){
+					audio.currentTime += pchtime_2;
+					//console.log(audio.currentTime);
+				}
+				
 			}
-			else if(touch_arr[len][0]<width/2&&touch_arr[len][1]>height/2){
+			else if((touch_arr[len][0]<width/2)&&(touch_arr[len][1]>height/2)){
 				//左下角
-				$('.logo')[0].style.webkitTransform = 'rotate('+(rotate-x+touch_arr[len][0]-y+touch_arr[len][1])/20+'deg)';
-				audio.currentTime -= (x-touch_arr[len][0])/5;
-				audio.currentTime -= (y-touch_arr[len][1])/5;
+				$('.logo')[0].style.webkitTransform = 'rotate('+(parseInt(rotate)+pdeg_3)+'deg)';
+				if(len%8 == 1){
+					audio.currentTime += pchtime_3;
+					//console.log(audio.currentTime);
+				}
 			}
-			else if(touch_arr[len][0]<width/2&&touch_arr[len][1]<height/2){
+			else if((touch_arr[len][0]<width/2)&&(touch_arr[len][1]<height/2)){
 				//左上角
-				$('.logo')[0].style.webkitTransform = 'rotate('+(rotate+x-touch_arr[len][0]-y+touch_arr[len][1])/20+'deg)';
-				audio.currentTime += (x-touch_arr[len][0])/5;
-				audio.currentTime -= (y-touch_arr[len][1])/5;
+				$('.logo')[0].style.webkitTransform = 'rotate('+(parseInt(rotate)+pdeg_4)+'deg)';
+				if(len%8 == 1){
+					audio.currentTime += pchtime_4;
+					//console.log(audio.currentTime);
+				}
 			}
 			//document.write(x+'<br>'+y+'<br>'+audio.currentTime);
-		},false)
-		document.body.addEventListener('mouseup',function(){
+		}
+		
+		$('.cover').bind('mouseup',function(){
+			p = 1;
 			audio.play();
-		},false)
-		*/
+			$('.cover').unbind('mousemove', turn);
+		})
+		
 	
 	}
 	,init: function(){
