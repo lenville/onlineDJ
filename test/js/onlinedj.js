@@ -7,8 +7,8 @@ function init() {
 	bufferLoader = new BufferLoader(
 		context,
 		[
-			'music/1.mp3',
-			'music/2.mp3',
+			'music/1.mp3'
+			//'music/2.mp3',
 		],
 		finishedLoading
 	);
@@ -34,10 +34,7 @@ function createSource(buffer){
 function finishedLoading(bufferList) {	
 	//创建节点实例
 	var source1 = createSource(bufferList[0]);
-	source1.source
-	source1.filter
-	source1.gainNode
-	source1.noteOn(1);//播放该实例time次
+	source1.filter.noteOn(0);//播放该实例time次
 	}
 
 
