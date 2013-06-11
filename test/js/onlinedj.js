@@ -44,5 +44,5 @@ function finishedLoading(bufferList) {
 function setvolumn(gainNode, value){
 	gainNode.gain.value = value;
 
-}
+};
 
