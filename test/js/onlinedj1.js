@@ -21,6 +21,8 @@ var wet3 = 0;
 var masterDry = 0;
 var masterWet = 0;
 
+window.onload = setupRoutingGraph;
+
 function setupRoutingGraph () {
     context = new AudioContext();
 
