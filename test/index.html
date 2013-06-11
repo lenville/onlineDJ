@@ -55,7 +55,7 @@
 			init();
 			startLoadingSounds();
 			var audio1 = document.querySelector('audio');
-			var source1 = audioContext.createMediaElementSource(audioElement);
+			var source1 = audioContext.createMediaElementSource(audio1);
 			var gainNode = context.createGainNode();
 			gainNode.gain.value = 10;
 			//source1.connect(filter);
