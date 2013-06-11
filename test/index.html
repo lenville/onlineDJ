@@ -16,16 +16,20 @@
 			//初始化audio音乐
 			var audio = document.querySelector('audio');
 			var source = context.createMediaElementSource(audio);
-			//建立增益节点
+			//建立增益/过滤器节点
 			var gainNode = context.createGainNode();
 			var filter = context.createBiquadFilter();
-			//source1.connect(filter);
-			source.connect(gainNode);
+			
+			//节点绑定
+			source.connect(filter);
+			filter.connect(gainNode);
 			gainNode.connect(context.destination);
+
+
 			source.setvol = function(vol){
 				gainNode.gain.value = vol;
 			}
-			source.setvol(0.5);
+			//source.setvol(0.5);
 		}
 
 
