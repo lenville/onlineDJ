@@ -1,288 +1,44 @@
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-<title>
-Real-time Convolution Effects
-</title>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <script>
+        var context;
+        var bufferLoader;
+        window.addEventListener('load', init, false);
 
+        function init(){
+            context = new webkitAudioContext();
 
-<!-- Slider stuff -->
-<script type="text/javascript" src="lib/events.js"></script>
-<style type="text/css">
-  #slider { margin: 10px; }
-</style>
+            bufferLoader = new BufferLoader(
+                context,
+                [
+                    'music/1.mp3'
+                ],
+                finishedLoading
+            );
 
-<link rel="stylesheet" type="text/css" href="style/simple.css">
-
-
-<!-- Our javascript code -->
-<script type="text/javascript">
-window.onload = init;
-
-var context = 0;
-var source = 0;
-var convolver = 0;
-var gainNode1 = 0;
-var gainNode2 = 0;
-
-// Source buffers
-var humanVoice = 0;
-var guitar = 0;
-
-var backwards = 0;
-var loadCount = 0;
-var hilightedElement = 0;
-
-var fileCount = 29;
-var responseOffset = 2;
-
-var fileList = [
-    "music/1.mp3",       // 0
-    "music/2.mp3",    // 1
-];
-
-var assetList = 0;
-var presetList = 0;
-
-function getPreset(index) {
-    if (index < presetList.length)
-        return presetList[index];
-    return 0;
-}
-
-function Asset(url, index, type) {
-    this.url = url;
-    this.index = index;
-    this.type = type;
-    this.startedLoading = false;
-    this.loaded = false;
-    this.buffer = 0;
-    this.presetList = new Array();
-}
-
-Asset.prototype.load = function(preset) {
-    if (this.loaded) {
-        // Already loaded
-        preset.assetFinishedLoading(this);
-        return;
-    }
-
-    // Keep track of this preset as a dependency
-    var n = this.presetList.length;
-    this.presetList[n] = preset;
-    
-    if (this.startedLoading) {
-        return;
-    }
-
-    this.startedLoading = true;
-        
-    // Load asynchronously
-    var request = new XMLHttpRequest();
-    request.open("GET", this.url, true);
-    request.responseType = "arraybuffer";
-    this.request = request;
-    
-    var asset = this;
-
-    request.onload = function() {
-        // asset.buffer = request.buffer;
-        asset.buffer = context.createBuffer(request.response, false);
-        asset.loaded = true;
-
-        // Tell all the presets that depend on us that we're ready
-        for (i = 0; i < asset.presetList.length; i++) {
-            var preset = asset.presetList[i];
-            preset.assetFinishedLoading(asset);
+            bufferLoader.load();
         }
-    }
 
-    request.send();
-}
-
-function Preset(presetIndex, title, sampleIndex, impulseResponseIndex, mainGain, sendGain) {
-    this.mainGain = mainGain;
-    this.sendGain = sendGain;
-
-    this.title = title;
-    this.divName = 'preset' + presetIndex;
-    this.presetIndex = presetIndex;
-    this.sampleIndex = sampleIndex;
-    this.impulseResponseIndex = impulseResponseIndex + responseOffset; // passed in index starts at 0 for responses
-    this.sampleBuffer = 0;
-    this.impulseResponseBuffer = 0;
-
-    // Add div for this preset
-    var presetListDiv = document.getElementById('presetList');
-
-    var presetDiv = '<div id="'
-    presetDiv += this.divName;
-    presetDiv += '">';
-    var s = this.generateDivString(false);
-    presetDiv += s;
-    presetDiv += '</div>';
-    presetListDiv.innerHTML += presetDiv;
-}
-
-Preset.prototype.div = function() {
-    var myDiv = document.getElementById(this.divName);
-    return myDiv;
-}
-
-Preset.prototype.generateDivString = function(isLoaded) {
-    var s = '<div class="bigList"';
-
-    if (isLoaded) {
-        s += ' onmousedown="presetList[';
-        s += this.presetIndex;
-        s += '].play(); highlightElement(this);"';
-    }
-
-    s += '>';
-    s += this.title;
-    s += '</div>';
-
-    return s;
-}
-
-Preset.prototype.assetFinishedLoading = function(asset) {
-    switch (asset.type) {
-        case 0: this.sampleBuffer = asset.buffer; break;
-        case 1: this.impulseResponseBuffer = asset.buffer; break;
-    }
-    
-    if (this.isFullyLoaded()) {
-        // Remove loading animation
-        var div = document.getElementById(this.divName);
-        var s = this.generateDivString(true);
-        div.innerHTML = s;
-        
-        var nextPreset = getPreset(this.presetIndex + 1);
-        if (nextPreset) {
-            nextPreset.load();
+        function finishedLoading(bufferList){
+            var source = context.createBufferSource();
+            source.buffer = bufferList[0];
+            source.connect(context, destination);
+            source.noteOn(0);
         }
-        
-        // Autoplay first preset
-        if (this.presetIndex == 0) {
-            this.play();
-            highlightElement(this.div());
+
+
+        function playSound(buffer) {
+            var source = context.createBufferSource(); // 创建一个声音源
+            source.buffer = buffer;                    // 告诉该源播放何物
+            source.connect(context.destination);       //将该源与硬件相连
+            source.noteOn(0);                          // 现在播放该实例
         }
-    }
-}
-
-Preset.prototype.isFullyLoaded = function() {
-    return this.sampleBuffer && this.impulseResponseBuffer;
-}
-
-Preset.prototype.load = function() {
-    sampleAsset = assetList[this.sampleIndex];
-    impulseResponseAsset = assetList[this.impulseResponseIndex];
-    
-    sampleAsset.load(this);
-    impulseResponseAsset.load(this);    
-}
-
-Preset.prototype.play = function() {
-    source.buffer = this.sampleBuffer;
-    convolver.buffer = this.impulseResponseBuffer;
-
-    gainNode1.gain.value = this.mainGain;
-    gainNode2.gain.value = this.sendGain;
-
-    source.noteOn(0);
-}
-
-function highlightElement(object) {
-    if (hilightedElement) hilightedElement.style.backgroundColor = "white";
-    hilightedElement = object;
-
-    object.style.backgroundColor = "green";
-}
-
-function initAssets() {
-    assetList = new Array();
-    
-    for (i = 0; i < fileList.length; i++) {
-        var type = i < responseOffset ? 0 : 1;
-        assetList[i] = new Asset(fileList[i], i, type);
-    }
-}
-
-function initPresets() {
-    presetList = new Array();
-    
-    var n = 0;
-    
-    presetList[n] = new Preset(n++, 'test1 (unprocessed)', 0, 0, 0.35, 0.0);
-    /*presetList[n] = new Preset(n++, 'test1 (spreader)', 0, 17, 0.2, 0.5);
-    presetList[n] = new Preset(n++, 'test1 (telephone filter)', 0, 2, 0.0, 1.0);
-    presetList[n] = new Preset(n++, 'test1 (lowpass filter)', 0, 24, 0.0, 0.3);
-    presetList[n] = new Preset(n++, 'test1 (spring reverb simulation)', 0, 18, 0.0, 0.8);
-    presetList[n] = new Preset(n++, 'test1 (comb filter 1)', 0, 6, 0.0, 0.7);
-    presetList[n] = new Preset(n++, 'test1 (comb filter 2)', 0, 7, 0.0, 0.7);
-    
-    presetList[n] = new Preset(n++, 'test1 (wild echo)', 0, 15, 0.0, 1.0);
-    presetList[n] = new Preset(n++, 'test1 (chorus rhythm)', 0, 16, 0.25, 1.25);
-    presetList[n] = new Preset(n++, 'test1 (backwards)', 0, 0, 0.0, 0.4);
-    
-    presetList[n] = new Preset(n++, 'test1 (extreme backwards - be patient!)', 0, 13, 0.0, 0.5);
-    presetList[n] = new Preset(n++, 'test1 (real warehouse)', 0, 11, 0.15, 0.5);
-    presetList[n] = new Preset(n++, 'test1 (real binaurally recorded hall)', 0, 14, 0.3, 0.5);
-    presetList[n] = new Preset(n++, 'test1 (matrix reverb)', 0, 9, 0.3, 0.8);
-    presetList[n] = new Preset(n++, 'test1 (synthetic dense hall)', 0, 10, 0.2, 0.2);
-    presetList[n] = new Preset(n++, 'test1 (real living-bedroom)', 0, 23, 0.2, 0.8);*/
-
-    presetList[n] = new Preset(n++, 'test2 (unprocessed)', 1, 0, 0.35, 0.0);/*
-    presetList[n] = new Preset(n++, 'test2 (spreader)', 1, 17, 0.2, 0.5);
-    presetList[n] = new Preset(n++, 'test2 (telephone filter)', 1, 2, 0.0, 1.0);
-    presetList[n] = new Preset(n++, 'test2 (lowpass filter)', 1, 24, 0.0, 0.3);
-    presetList[n] = new Preset(n++, 'test2 (spring reverb simulation)', 1, 18, 0.0, 0.8);
-    presetList[n] = new Preset(n++, 'test2 (comb filter 1)', 1, 6, 0.0, 0.7);
-    presetList[n] = new Preset(n++, 'test2 (comb filter 2)', 1, 7, 0.0, 0.7);
-    presetList[n] = new Preset(n++, 'test2 (wild echo)', 1, 15, 0.0, 1.0);
-    presetList[n] = new Preset(n++, 'test2 (chorus rhythm)', 1, 16, 0.25, 1.25);
-    presetList[n] = new Preset(n++, 'test2 (backwards)', 1, 0, 0.0, 0.4);
-    presetList[n] = new Preset(n++, 'test2 (extreme backwards - be patient!)', 1, 13, 0.0, 0.5);
-    presetList[n] = new Preset(n++, 'test2 (real warehouse)', 1, 11, 0.15, 0.5);
-    presetList[n] = new Preset(n++, 'test2 (real binaurally recorded hall)', 1, 14, 0.3, 0.5);
-    presetList[n] = new Preset(n++, 'test2 (matrix reverb)', 1, 9, 0.3, 0.8);
-    presetList[n] = new Preset(n++, 'test2 (synthetic dense hall)', 1, 10, 0.2, 0.2);
-    presetList[n] = new Preset(n++, 'test2 (real living-bedroom)', 1, 23, 0.2, 0.8);*/
-}
-
-function init() {
-    context = new webkitAudioContext();
-    
-    convolver = context.createConvolver();
-    source = context.createBufferSource();
-
-    gainNode1 = context.createGainNode();
-    gainNode2 = context.createGainNode();
-    gainNode1.gain.value = 1.0;
-    gainNode2.gain.value = 2.0;
-
-    source.connect(gainNode1);
-    gainNode1.connect(context.destination);
-    
-    source.connect(convolver);
-    convolver.connect(gainNode2);
-    gainNode2.connect(context.destination);
-
-    source.looping = true;
-
-    // Start loading
-    initAssets();
-    initPresets();
-    presetList[0].load();
-}
-</script>
+    </script>
+</head>
 <body>
-<div id="controls"> </div>
-<h1> Real-time Convolution Effects </h1>
-<!-- Information -->
-<div id="presetList">
-</div>
-</div>
 
 </body>
 </html>
