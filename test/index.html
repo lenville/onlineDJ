@@ -41,10 +41,10 @@
 
 		function init(){
 			try{
-				audioContext = new AudioContext();
+				context = new AudioContext();
 			}catch(e){
 				try{
-					audioContext = new webkitAudioContext();
+					context = new webkitAudioContext();
 				}catch(e){
 					alert('Web Audio API is not supported in this browser.');
 				}
@@ -55,8 +55,8 @@
 			init();
 			startLoadingSounds();
 			var audio1 = document.querySelector('audio');
-			var source1 = audioContext.createMediaElementSource(audio1);
-			var gainNode = audioContext.createGainNode();
+			var source1 = context.createMediaElementSource(audio1);
+			var gainNode = context.createGainNode();
 			gainNode.gain.value = 10;
 			//source1.connect(filter);
 			source1.connect(gainNode);
