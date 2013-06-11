@@ -1,5 +1,7 @@
 window.onload  = init;
++
 var context = new webkitAudioContext();//建立AudioContext实例,webKit核心的浏览器, 需要加上webkit前缀
+var compressor = context.createDynamicsCompressor();
 var bufferLoader;//创建AudioBuffer
 
 /*Web Audio API初始化读取音频文件*/
@@ -34,7 +36,7 @@ function createSource(buffer){
 function finishedLoading(bufferList) {	
 	//创建节点实例
 	var source1 = createSource(bufferList[0]);
-	source1.filter.noteOn(0);//播放该实例time次
+	source1.start(0);
 	}
 
 
