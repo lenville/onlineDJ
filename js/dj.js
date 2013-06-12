@@ -18,6 +18,7 @@ var dj = {
 			setTimeout(arguments.callee, time);
 		}, time)
 	}
+	//音乐加载
 	,startMusic: function (name){
 		
 		if(!audio)
@@ -45,6 +46,7 @@ var dj = {
 		})
 		
 	}
+	//擦盘音乐加载
 	,startRubMusic: function(){
 		var rubAudio = new Audio('music/rub.wav');
 		rubAudio.volume = rubVolume;
@@ -52,6 +54,7 @@ var dj = {
 			rubAudio.play();			
 		},false)
 	}
+	//擦盘加载
 	,startRub: function(){
 		this.interval(fn,30);
 		var pdeg = 360/(ptime/0.03)
@@ -62,15 +65,16 @@ var dj = {
 			$('.logo')[0].style.webkitTransform = 'rotate('+(parseInt(rotate)+pdeg)+'deg)';
 		}
 	}
+	//擦盘实现
 	,rub: function() {
 		var baseX , baseY
 		,height = $('.cover')[0].clientHeight
 		,width = $('.cover')[0].clientWidth
 		,reg = /\-?[0-9]+\.?[0-9]*/g 
-		that = this
+		that = this;
 
 
-		//触控版的绑定
+		//触控版的擦盘实现
 		document.addEventListener('touchstart',function(){
 			baseX = event.touches[0].clientX - $('.table')[0].offsetLeft;
 			baseY = event.touches[0].clientY - $('.table')[0].offsetTop;
@@ -159,7 +163,7 @@ var dj = {
 		},false)
 
 
-		//电脑版的绑定
+		//电脑版的擦盘实现
 		$('.cover').bind('mousedown',function(){
 			baseX = event.clientX - $('.table')[0].offsetLeft;
 			baseY = event.clientY - $('.table')[0].offsetTop;
@@ -254,27 +258,31 @@ var dj = {
 	//拖动事件
 	,drag: function(){
 		var that = this;
+		//开始移出时信息传递
 		$('.musiclist').bind('dragstart',function(){
 			event.dataTransfer.setData('Text',this.childNodes[5].value);
 		})
-		$('.musiclist').bind('click',function(){
-			stop = 0;
-			$('.logo').css('background','url(image/'+this.childNodes[5].value+'.png)');
-			that.startMusic(this.childNodes[5].value);
-			//web_audio_api_init();
-			$('#play').val('暂停');
-		})
+		//取消唱碟机区域的可拖拽事件
 		$('.cover').bind('dragover',function(){
 			event.preventDefault();
 		})
 		$('.cover').bind('dragenter',function(){
 			event.preventDefault();
 		})
+		//拖拽到达唱碟机区域时切换歌曲
 		$('.cover').bind('drop',function(){
 			var data = event.dataTransfer.getData('Text');
 			stop = 0;
 			$('.logo').css('background','url(image/'+data+'.png)');
 			that.startMusic(data);
+			//web_audio_api_init();
+			$('#play').val('暂停');
+		})
+		//点击也可切换歌曲的绑定
+		$('.musiclist').bind('click',function(){
+			stop = 0;
+			$('.logo').css('background','url(image/'+this.childNodes[5].value+'.png)');
+			that.startMusic(this.childNodes[5].value);
 			//web_audio_api_init();
 			$('#play').val('暂停');
 		})
@@ -342,6 +350,7 @@ var dj = {
 				$('#'+filter_arr[j][0])[0].disabled = false;
 			}
 		})
+		//每个按钮的绑定
 		function fn(k){
 			$('#'+filter_arr[k][0]).bind('click', function(){
 				if(filter_arr[k][1] == 0)
@@ -358,7 +367,7 @@ var dj = {
 		for(var i = 0; i < 8; i++) {
 			fn(i);
 		}
-
+		//下面三个控制条的绑定
 		$('#frequency').bind('change', function(){
 			var frequency_arr = [220,440,880,1600,3200,6400];
 			source.setfilter.frequency(frequency_arr[this.value]);
@@ -371,14 +380,15 @@ var dj = {
 		})
 
 	}
+	//执行此对象
 	,init: function(){
 		$('body')[0].style.height = document.documentElement.clientHeight;
-		this.startMusic();
-		this.startRub();
-		this.drag();
-		this.rub();
-		web_audio_api_init();
-		this.control();
+		this.startMusic();//音乐加载
+		this.startRub();//擦盘加载
+		this.drag();//拖拽绑定
+		this.rub();//擦盘实现
+		web_audio_api_init();//滤波器加载
+		this.control();//控制绑定
 	}
 }
 dj.init();
