@@ -1,17 +1,23 @@
-var gainNode, filter, source;
+
+var gainNode, filter, source, context;
 
 function web_audio_api_init(){
 	//初始化audiocontext
-	try{
+	
+	try{ 
+		delete context;
+		gainNode = null;
+		filter = null;
+		source = null;
 		context = new AudioContext();
 	}catch(e){
 		try{
 			context = new webkitAudioContext();
 		}catch(e){
-			alert('Web Audio API is not supported in this browser.');
+			//alert('Web Audio API is not supported in this browser.');
 		}
 	}
-
+	
 	//初始化audio音乐
 	source = context.createMediaElementSource(audio);
 

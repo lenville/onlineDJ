@@ -7,8 +7,9 @@ var ptime = 5;
 var p = 0;
 //擦盘声音音量(0-1.0)
 var rubVolume = 0.5;
+//停止控制
+var stop = 1;
 //var a;
-
 var dj = {	
 	//定时器
 	interval: function (fn,time){
@@ -17,29 +18,30 @@ var dj = {
 			setTimeout(arguments.callee, time);
 		}, time)
 	}
-	,audiocontext: function (){
-		//初始化audiocontext
-		try{
-			context = new AudioContext();
-		}catch(e){
-			try{
-				context = new webkitAudioContext();
-			}catch(e){
-				alert('Web Audio API is not supported in this browser.');
-			}
-		}
-	}
 	,startMusic: function (name){
-		p = 1;
+		
 		if(!audio)
-			audio = new Audio('music/'+name+'.mp3');
-		else 
-			audio.src = 'music/'+name+'.mp3';
-			audio.addEventListener('canplaythrough', function(){
-			audio.play();		
+			audio = document.querySelector('audio');
+		else{
+			delete audio;
+			audio = null;
+			$('#au').html('');
+			$('#au').html('<audio src="music/'+name+'.mp3"></audio>');
+			audio = document.querySelector('audio');
+			
+		}
+		//绑定加载完开始
+		audio.addEventListener('canplaythrough', function(){
+			if(stop == 0){
+				p = 1;
+				audio.play();
+			}		
 		},false)
+		//绑定播放完停止
 		audio.addEventListener('ended', function(){
+			stop = 1;
 			p = 0;
+			$('#play')[0].value = '开始';
 		})
 		
 	}
@@ -149,8 +151,10 @@ var dj = {
 		},false)
 		document.addEventListener('touchend',function(){
 			if(audio&&!audio.ended){
-				p = 1;
-				audio.play();
+				if(stop == 0){
+					p = 1;
+					audio.play();
+				}
 			}
 		},false)
 
@@ -239,10 +243,11 @@ var dj = {
 		
 		$('.cover').bind('mouseup',function(){
 			if(audio&&!audio.ended){
-				p = 1;
-				audio.play();
+				if(stop == 0){
+					p = 1;
+					audio.play();
+				}
 			}
-			
 			$('.cover').unbind('mousemove', turn);
 		})
 	}
@@ -253,7 +258,11 @@ var dj = {
 			event.dataTransfer.setData('Text',this.childNodes[5].value);
 		})
 		$('.musiclist').bind('click',function(){
+			stop = 0;
+			$('.logo').css('background','url(image/'+this.childNodes[5].value+'.png)');
 			that.startMusic(this.childNodes[5].value);
+			//web_audio_api_init();
+			$('#play').val('暂停');
 		})
 		$('.cover').bind('dragover',function(){
 			event.preventDefault();
@@ -263,21 +272,18 @@ var dj = {
 		})
 		$('.cover').bind('drop',function(){
 			var data = event.dataTransfer.getData('Text');
-			that.startMusic(data)
-			//console.log(data);
+			stop = 0;
+			$('.logo').css('background','url(image/'+data+'.png)');
+			that.startMusic(data);
+			//web_audio_api_init();
+			$('#play').val('暂停');
 		})
 	}
 	//控制区域事件
 	,control: function(){
 		var that = this
-		,filter_arr = [	["lowpass",0], 
-					  ["highpass",0],
-					  ["bandpass",0],
-					  ["lowshelf",0],   
-					  ["highshelf",0],
-					  ["peaking",0],
-					  ["notch",0],
-					  ["allpass",0]];
+		,filter_arr = [["lowpass",0],["highpass",0],["bandpass",0],["lowshelf",0],["highshelf",0],["peaking",0],["notch",0],["allpass",0]];
+		a = filter_arr;
 		//开始暂停
 			$('#play').bind('click',function(){
 				if(!audio){
@@ -286,11 +292,13 @@ var dj = {
 				}
 				else{
 					if(audio.paused){
+						stop = 0;
 						audio.play();
 						this.value = '暂停';
 						p = 1;
 					}
 					else{
+						stop = 1;
 						audio.pause();
 						this.value = '开始';
 						p = 0;
@@ -301,6 +309,7 @@ var dj = {
 		//停止
 			$('#stop').bind('click',function(){			
 				audio.pause();
+				stop = 1;
 				audio.currentTime = 0;
 				$('#play').val('开始');
 				p = 0;
@@ -315,28 +324,61 @@ var dj = {
 		$('#rubvolume').bind('change', function(){
 			rubVolume = this.value/100;
 		})
+
 		//滤波器
-		function filter (arr){
-			for (var i = 0; i < 8; i++) {
-				$('#'+arr[i][0]).bind('click', function(){
-					arr[i][1] = 1?0:1;
-				})
+		//开
+		$('#filter-on').bind('click', function(){
+			source.addfilter();
+			$('#filter-on')[0].disabled = true;
+			$('#filter-off')[0].disabled = false;
+			source.setfilter.type(filter_arr[7][0]);
+		})
+		//关
+		$('#filter-off').bind('click', function(){
+			source.removefilter();
+			$('#filter-off')[0].disabled = true;
+			$('#filter-on')[0].disabled = false;
+			for(var j = 0; j < 8; j++) {
+				$('#'+filter_arr[j][0])[0].disabled = false;
 			}
-		}(filter_arr);
+		})
+		function fn(k){
+			$('#'+filter_arr[k][0]).bind('click', function(){
+				if(filter_arr[k][1] == 0)
+					filter_arr[k][1] = 1;
+				source.setfilter.type(filter_arr[k][0]);
+				for(var j = 0; j < 8; j++) {
+					if(k == j)
+						$('#'+filter_arr[j][0])[0].disabled = true;
+					else
+						$('#'+filter_arr[j][0])[0].disabled = false;
+				}
+			})
+		}
+		for(var i = 0; i < 8; i++) {
+			fn(i);
+		}
+
 		$('#frequency').bind('change', function(){
 			var frequency_arr = [220,440,880,1600,3200,6400];
-			source.setfilter.frequency(frequency_arr[this.value])
+			source.setfilter.frequency(frequency_arr[this.value]);
+		})
+		$('#q').bind('change', function(){
+			source.setfilter.q(this.value);
+		})
+		$('#filtergain').bind('change', function(){
+			source.setfilter.gain(this.value);
 		})
 
 	}
 	,init: function(){
 		$('body')[0].style.height = document.documentElement.clientHeight;
-		//this.startMusic('1');
+		this.startMusic();
 		this.startRub();
 		this.drag();
 		this.rub();
-		this.control();
 		web_audio_api_init();
+		this.control();
 	}
 }
 dj.init();

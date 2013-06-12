@@ -28,7 +28,11 @@
 				<input type="range" id="rubvolume" value="50" min="0" max="100" step="1">
 			</dd>
 			<dt>
-				滤波器
+				滤波
+				<div class="btn-group">
+					<input type="button" class="btn btn-small" id="filter-on" value="On">
+					<input type="button" class="btn btn-small" id="filter-off" value="Off">
+				</div>
 			</dt>
 			<dd>
 				<input type="button" class="btn btn-small" id="lowpass" value="低通">
@@ -55,7 +59,7 @@
 				<input type="range" id="q" value="1" min="0" max="1" step="0.1">
 			</dd>
 			<dd>
-				<small>滤波音量</small>
+				<small>滤波特效</small>
 				<input type="range" id="filtergain" value="50" min="0" max="100" step="1">
 			</dd>
 		</dl>
@@ -77,22 +81,27 @@
 	
 	<aside class="right span2 offset1">
 		<div class="musiclist" draggable="true">
-			<img src="http://img3.douban.com/icon/u58482685-2.jpg" draggable="false">
-			<span>1.mp3</span>
+			<img src="image/mini_1.png" draggable="false">
+			<span>加州旅馆.mp3</span>
 			<input type="hidden" value="1">
 		</div>
 		<div class="musiclist" draggable="true">
-			<img src="http://img3.douban.com/icon/u58482685-2.jpg" draggable="false">
-			<span>2.mp3</span>
+			<img src="image/mini_2.png" draggable="false">
+			<span>富士山下.mp3</span>
 			<input type="hidden" value="2">
 		</div>
 		<div class="musiclist" draggable="true">
-			<img src="http://img3.douban.com/icon/u58482685-2.jpg" draggable="false">
-			<span>3.mp3</span>
+			<img src="image/mini_3.png" draggable="false">
+			<span>自挂东南枝.mp3</span>
 			<input type="hidden" value="3">
 		</div>
 	</aside>
+	<div id="au">
+		<audio src="music/1.mp3" controls></audio>
+	</div>
+	
 </body>
 	<script src="js/jquery.js" type="text/javascript"></script>
+	<script src="js/web_audio_api.js" type="text/javascript"></script>
 	<script src="js/dj.js" type="text/javascript"></script>
 </html>

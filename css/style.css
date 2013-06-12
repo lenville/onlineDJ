@@ -2,6 +2,10 @@ body{
 	background-image: url('../image/bg.png');
 }
 
+audio{
+	display: none;
+}
+
 .left{
 	margin-top: 47px;
 	margin-left: -4px;
@@ -17,8 +21,17 @@ body{
 	margin: 5px;
 	margin-left: 35px;
 }
+.left .btn-group{
+	margin-left: 10px;
+}
 .left .btn-small{
 	margin: 5px 0 0 35px;
+}
+.left #frequency, .left #q, .left #filtergain{
+	width: 160px;
+}
+.left #frequency{
+	margin-left: 25px;
 }
 
 .right{
