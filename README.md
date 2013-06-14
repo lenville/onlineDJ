@@ -1,7 +1,7 @@
 OnlineDJ
 ========
 
-详情请见[Demo][http://202.117.120.91/onlineDJ/]
+详情请见[Demo](http://202.117.120.91/onlineDJ/)
 
 如若要访问Demo, 请遵循以下指引
 	1.滤波器的功能在页面及音乐加载完成时打开开关调整相应参数进行测试(只对开始加载的音源绑定了相应的Filter节点)
@@ -14,8 +14,8 @@ OnlineDJ
 	3.未来可能扩展到实时处理, 以满足独立广播的需求
 
 我们使用W3组织标准化的Web Audio API来完成底层的音效处理
-[https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html][https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html]
+[https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html](https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html)
 
 使用Bootstrap以及JQuery完成基本展示框架的构建
-[http://twitter.github.io/bootstrap/][http://twitter.github.io/bootstrap/]
-[http://jquery.com/][http://jquery.com/]
+[http://twitter.github.io/bootstrap/](http://twitter.github.io/bootstrap/)
+[http://jquery.com/](http://jquery.com/)
