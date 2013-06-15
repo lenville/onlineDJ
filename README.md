@@ -1,6 +1,8 @@
 OnlineDJ
 ========
 
+>本项目在西安电子科技大学 OpenM.S.活动中获得最佳作品奖
+
 详情请见[Demo](http://xlucien.net/onlineDJ/)  
 
 如若要访问Demo, 请遵循以下指引  
