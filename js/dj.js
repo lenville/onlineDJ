@@ -60,9 +60,12 @@ var dj = {
 		var pdeg = 360/(ptime/0.03)
 		,reg = /\-?[0-9]+\.?[0-9]*/g ;
 		function fn (){
-			var rotate = $('.logo')[0].style.webkitTransform.match(reg)[0];
-			if(p == 1)
-			$('.logo')[0].style.webkitTransform = 'rotate('+(parseInt(rotate)+pdeg)+'deg)';
+			var rotate = $('.logo')[0].style.msTransform||$('.logo')[0].style.webkitTransform;
+			rotate = (rotate&&rotate.match(reg)) ? rotate.match(reg)[0] : 0 ;
+			if(p == 1){
+				$('.logo')[0].style.msTransform = 'rotate('+(parseInt(rotate)+pdeg)+'deg)';
+				$('.logo')[0].style.webkitTransform = 'rotate('+(parseInt(rotate)+pdeg)+'deg)';
+			}
 		}
 	}
 	//擦盘实现
@@ -95,9 +98,10 @@ var dj = {
 			touch_arr.push([x,y])
 			var len = touch_arr.length - 2
 			//console.log(len);
-			,rotate = $('.logo')[0].style.webkitTransform.match(reg)[0]
+			,rotate = $('.logo')[0].style.msTransform||$('.logo')[0].style.webkitTransform;
+			rotate = (rotate&&rotate.match(reg)) ? rotate.match(reg)[0] : 0 ;
 			//每次转动角度
-			,pdeg_1 = (x-touch_arr[len][0]+y-touch_arr[len][1])/7
+			var pdeg_1 = (x-touch_arr[len][0]+y-touch_arr[len][1])/7
 			,pdeg_2 = (-x+touch_arr[len][0]+y-touch_arr[len][1])/7
 			,pdeg_3 = (-x+touch_arr[len][0]-y+touch_arr[len][1])/7
 			,pdeg_4 = (x-touch_arr[len][0]-y+touch_arr[len][1])/7
@@ -115,6 +119,7 @@ var dj = {
 			
 			if((touch_arr[len][0]>width/2)&&(touch_arr[len][1]<height/2)){
 				//右上角
+				$('.logo')[0].style.msTransform = 'rotate('+(parseInt(rotate)+pdeg_1)+'deg)';
 				$('.logo')[0].style.webkitTransform = 'rotate('+(parseInt(rotate)+pdeg_1)+'deg)';
 				if(len%8 == 1){
 					if(audio&&!audio.ended)
@@ -125,6 +130,7 @@ var dj = {
 			}
 			else if((touch_arr[len][0]>width/2)&&(touch_arr[len][1]>height/2)){
 				//右下角
+				$('.logo')[0].style.msTransform = 'rotate('+(parseInt(rotate)+pdeg_2)+'deg)';
 				$('.logo')[0].style.webkitTransform = 'rotate('+(parseInt(rotate)+pdeg_2)+'deg)';
 				if(len%8 == 1){
 					if(audio&&!audio.ended)
@@ -135,6 +141,7 @@ var dj = {
 			}
 			else if((touch_arr[len][0]<width/2)&&(touch_arr[len][1]>height/2)){
 				//左下角
+				$('.logo')[0].style.msTransform = 'rotate('+(parseInt(rotate)+pdeg_3)+'deg)';
 				$('.logo')[0].style.webkitTransform = 'rotate('+(parseInt(rotate)+pdeg_3)+'deg)';
 				if(len%8 == 1){
 					if(audio&&!audio.ended)
@@ -144,6 +151,7 @@ var dj = {
 			}
 			else if((touch_arr[len][0]<width/2)&&(touch_arr[len][1]<height/2)){
 				//左上角
+				$('.logo')[0].style.msTransform = 'rotate('+(parseInt(rotate)+pdeg_4)+'deg)';
 				$('.logo')[0].style.webkitTransform = 'rotate('+(parseInt(rotate)+pdeg_4)+'deg)';
 				if(len%8 == 1){
 					if(audio&&!audio.ended)
@@ -186,9 +194,10 @@ var dj = {
 			touch_arr.push([x,y])
 			var len = touch_arr.length - 2
 			//console.log(len);
-			,rotate = $('.logo')[0].style.webkitTransform.match(reg)[0]
+			,rotate = $('.logo')[0].style.msTransform||$('.logo')[0].style.webkitTransform;
+			rotate = (rotate&&rotate.match(reg)) ? rotate.match(reg)[0] : 0 ;
 			//每次转动角度
-			,pdeg_1 = (x-touch_arr[len][0]+y-touch_arr[len][1])/7
+			var pdeg_1 = (x-touch_arr[len][0]+y-touch_arr[len][1])/7
 			,pdeg_2 = (-x+touch_arr[len][0]+y-touch_arr[len][1])/7
 			,pdeg_3 = (-x+touch_arr[len][0]-y+touch_arr[len][1])/7
 			,pdeg_4 = (x-touch_arr[len][0]-y+touch_arr[len][1])/7
@@ -206,6 +215,7 @@ var dj = {
 			
 			if((touch_arr[len][0]>width/2)&&(touch_arr[len][1]<height/2)){
 				//右上角
+				$('.logo')[0].style.msTransform = 'rotate('+(parseInt(rotate)+pdeg_1)+'deg)';
 				$('.logo')[0].style.webkitTransform = 'rotate('+(parseInt(rotate)+pdeg_1)+'deg)';
 				if(len%8 == 1){
 					if(audio&&!audio.ended)
@@ -216,6 +226,7 @@ var dj = {
 			}
 			else if((touch_arr[len][0]>width/2)&&(touch_arr[len][1]>height/2)){
 				//右下角
+				$('.logo')[0].style.msTransform = 'rotate('+(parseInt(rotate)+pdeg_2)+'deg)';
 				$('.logo')[0].style.webkitTransform = 'rotate('+(parseInt(rotate)+pdeg_2)+'deg)';
 				if(len%8 == 1){
 					if(audio&&!audio.ended)
@@ -226,6 +237,7 @@ var dj = {
 			}
 			else if((touch_arr[len][0]<width/2)&&(touch_arr[len][1]>height/2)){
 				//左下角
+				$('.logo')[0].style.msTransform = 'rotate('+(parseInt(rotate)+pdeg_3)+'deg)';
 				$('.logo')[0].style.webkitTransform = 'rotate('+(parseInt(rotate)+pdeg_3)+'deg)';
 				if(len%8 == 1){
 					if(audio&&!audio.ended)
@@ -235,6 +247,7 @@ var dj = {
 			}
 			else if((touch_arr[len][0]<width/2)&&(touch_arr[len][1]<height/2)){
 				//左上角
+				$('.logo')[0].style.msTransform = 'rotate('+(parseInt(rotate)+pdeg_4)+'deg)';
 				$('.logo')[0].style.webkitTransform = 'rotate('+(parseInt(rotate)+pdeg_4)+'deg)';
 				if(len%8 == 1){
 					if(audio&&!audio.ended)
