@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="css/bootstrap.css">
+	<link rel="stylesheet" href="css/bootstrap-responsive.css">
+	<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+	<!--左边的控制栏开始-->
+	<aside class="left span3">
+		<dl>
+			<dt>
+				<input type="button" id='play' class="btn span1" value="开始">
+				<input type="button" id='stop' class="btn span1" value="停止">
+			</dt>
+			<dt>
+				音乐音量调节
+			</dt>
+			<dd>
+				<input type="range" id="volume" value="100" min="0" max="100" step="1">
+			</dd>
+			<dt>
+				擦盘音量调节
+			</dt>
+			<dd>
+				<input type="range" id="rubvolume" value="50" min="0" max="100" step="1">
+			</dd>
+			<dt>
+				滤波
+				<div class="btn-group">
+					<input type="button" class="btn btn-small" id="filter-on" value="On">
+					<input type="button" class="btn btn-small" id="filter-off" value="Off">
+				</div>
+			</dt>
+			<dd>
+				<input type="button" class="btn btn-small" id="lowpass" value="低通">
+				<input type="button" class="btn btn-small" id="highpass" value="高通">
+			</dd>
+			<dd>
+				<input type="button" class="btn btn-small" id="bandpass" value="带通">
+				<input type="button" class="btn btn-small" id="allpass" value="全通">
+			</dd>
+			<dd>
+				<input type="button" class="btn btn-small" id="lowshelf" value="低架">
+				<input type="button" class="btn btn-small" id="highshelf" value="高架">
+			</dd>
+			<dd>
+				<input type="button" class="btn btn-small" id="peaking" value="峰值">
+				<input type="button" class="btn btn-small" id="notch" value="陷波">
+			</dd>
+			<dd>
+				<small>频率</small>
+				<input type="range" id="frequency" value="1" min="0" max="5" step="1">
+			</dd>
+			<dd>
+				<small>质量因子</small>
+				<input type="range" id="q" value="1" min="0" max="1" step="0.1">
+			</dd>
+			<dd>
+				<small>滤波特效</small>
+				<input type="range" id="filtergain" value="50" min="0" max="100" step="1">
+			</dd>
+		</dl>
+	</aside>
+	<!--左边的控制栏结束-->
+	<!--中间的的唱碟机开始-->
+	<div class="shadow span6">
+		<div class="table">
+			<div class="platter">
+				<div class="logo" style="-webkit-transform: rotate(0deg)"></div>
+			</div>
+			<div class="tonearm"></div>
+			<div class="startstop"></div>
+			<div class="volumeup"></div>
+			<div class="volumedown"></div>
+			<div class="cover" draggable="false">
+			</div>
+		</div>
+	</div>
+	<!--中间的的唱碟机结束-->
+	<!--右边的的歌曲列表开始-->
+	<aside class="right span2 offset1">
+		<div class="musiclist" draggable="true">
+			<img src="image/mini_1.png" draggable="false">
+			<span>加州旅馆.mp3</span>
+			<input type="hidden" value="1">
+		</div>
+		<div class="musiclist" draggable="true">
+			<img src="image/mini_2.png" draggable="false">
+			<span>富士山下.mp3</span>
+			<input type="hidden" value="2">
+		</div>
+		<div class="musiclist" draggable="true">
+			<img src="image/mini_3.png" draggable="false">
+			<span>自挂东南枝.mp3</span>
+			<input type="hidden" value="3">
+		</div>
+	</aside>
+	<div id="au">
+		<audio src="music/1.mp3" controls></audio>
+	</div>
+	<!--右边的的歌曲列表开结束-->
+</body>
+	<script src="js/jquery.js" type="text/javascript"></script>
+	<script src="js/web_audio_api.js" type="text/javascript"></script>
+	<script src="js/dj.js" type="text/javascript"></script>
+</html>
