@@ -1,6 +1,9 @@
 OnlineDJ
 ========
 
+Collaborator  
+[Lucien](https://github.com/lucienthink)
+
 详情请见[Demo](http://lenville.github.io/onlineDJ/demo)  
 
 如若要访问Demo, 请遵循以下指引  
