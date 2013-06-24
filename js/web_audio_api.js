@@ -30,7 +30,6 @@ function web_audio_api_init(){
 	//绑定音量调节节点
 	source.connect(gainNode);
 	gainNode.connect(context.destination);
-
 	//音量调节
 	source.setvol = function(vol){
 		gainNode.gain.value = vol;
