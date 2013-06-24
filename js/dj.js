@@ -1,5 +1,5 @@
 var audio;
-var location = 'http://xlucien.net/project/onlineDJ/index.html';
+var url = 'http://xlucien.net/project/onlineDJ/index.html';
 //滤波器对象
 var source;
 //每转一圈所需时间（单位：秒）
@@ -13,12 +13,12 @@ var dj = {
 		audio = document.querySelector('audio');
 		//绑定加载完开始
 		audio.addEventListener('canplaythrough', function(){
-			window.top.postMessage('ready',location);
+			window.top.postMessage('ready',url);
 		},false)
 		//绑定播放完停止
 		audio.addEventListener('ended', function(){
 			stop = 1;
-			window.top.postMessage('stop',location);
+			window.top.postMessage('stop',url);
 		},false)
 	}
 	//控制区域事件
