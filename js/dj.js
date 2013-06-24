@@ -1,5 +1,6 @@
 var audio;
-var url = 'http://xlucien.net/project/onlineDJ/index.html';
+//父窗口的url
+var url = window.top.location.href+'index.html';
 //滤波器对象
 var source;
 //每转一圈所需时间（单位：秒）
@@ -13,6 +14,7 @@ var dj = {
 		audio = document.querySelector('audio');
 		//绑定加载完开始
 		audio.addEventListener('canplaythrough', function(){
+			//发送到父窗口，通知已加载完，父窗口控制开始播放
 			window.top.postMessage('ready',url);
 		},false)
 		//绑定播放完停止
