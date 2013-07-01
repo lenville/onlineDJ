@@ -1,7 +1,10 @@
 OnlineDJ
 ========
 
-详情请见[Demo](http://xlucien.net/onlineDJ/)  
+Collaborator  
+[Lucien](https://github.com/lucienthink)
+
+详情请见[Demo](http://xlucien.net/project/onlineDJ/)  
 
 如若要访问Demo, 请遵循以下指引  
 + 滤波器的功能在页面及音乐加载完成时打开开关调整相应参数进行测试(只对开始加载的音源绑定了相应的Filter节点)  

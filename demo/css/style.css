@@ -5,7 +5,9 @@ body{
 audio{
 	display: none;
 }
-
+iframe{
+	display: none;
+}
 .left{
 	margin-top: 47px;
 	margin-left: -4px;
