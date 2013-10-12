@@ -1,7 +1,9 @@
 OnlineDJ
 ========
 
-Collaborator  
+在校期间参加Hackathon的产物
+
+合作伙伴  
 [Lucien](https://github.com/lucienthink)
 
 详情请见[Demo](http://lenville.github.com/onlineDJ/demo/)  
